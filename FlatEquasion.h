@@ -4,7 +4,7 @@
 using namespace std;
 
 class FlatEquasion{
-	vector<int64_t> factors;
+	vector<ZNumber> factors;
 
 	void getMatrix(const Matrix &matrix);
 public:
@@ -12,7 +12,7 @@ public:
 	FlatEquasion();
 	FlatEquasion(const Matrix &matrix);
 
-	vector<int64_t> getPolynomial() const;
+	vector<ZNumber> getPolynomial() const;
 
 
 	friend ostream &operator<<(ostream &o, const FlatEquasion &fe);

@@ -5,6 +5,8 @@
 #include <chrono>
 #include <random>
 
+#include "config.hpp"
+#include "ZNumber.hpp"
 #include "Matrix.h"
 
 Matrix::Matrix(){
@@ -14,19 +16,13 @@ Matrix::Matrix(uint16_t rowNumber, uint16_t colNumber){
 	resize(rowNumber, colNumber);
 }
 
-Matrix::Matrix(const vector<vector<int64_t>> &matrix){
+Matrix::Matrix(const vector<vector<ZNumber>> &matrix){
 	for(auto i = matrix.begin(); i != matrix.end() - 1; ++i)
 		if(i->size() != (i + 1)->size())
 			throw logic_error("Row size does not match");
 	this->matrix = matrix;
-	normalize();
 }
 
-void Matrix::normalize(){
-	for(auto &row : matrix)
-		for(auto &n : row)
-			n %= module;
-}
 
 void Matrix::resize(uint16_t rowNumber, uint16_t colNumber){
 	matrix.resize(rowNumber);
@@ -39,29 +35,28 @@ void Matrix::randomize(int64_t maxValue){
 	mt19937 g1(seed1);
 	for(auto &row : matrix)
 		for(auto &coord : row)
-			coord = g1() % maxValue;
+			coord = g1();
 
-	normalize();
 }
 
-void Matrix::insertRow(const vector<int64_t> &row){
+void Matrix::insertRow(const vector<ZNumber> &row){
 	if(matrix.empty() == false)
 		if(matrix.front().size() != row.size())
 			throw logic_error("row size doesn't match");
 
-	vector<int64_t> newRow;
+	vector<ZNumber> newRow;
 	newRow.reserve(row.size());
 	for(auto n : row)
-		newRow.push_back(n % module);
+		newRow.push_back(n);
 
 	matrix.push_back(move(newRow));
 }
 
-vector<int64_t> Matrix::getRow(uint16_t rowNumber) const{
+vector<ZNumber> Matrix::getRow(uint16_t rowNumber) const{
 	return matrix.at(rowNumber);
 }
 
-void Matrix::replaceRow(uint16_t rowNumber, const vector<int64_t> &row){
+void Matrix::replaceRow(uint16_t rowNumber, const vector<ZNumber> &row){
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 
@@ -77,7 +72,7 @@ void Matrix::replaceRow(uint16_t rowNumber, const vector<int64_t> &row){
 	matrix.at(rowNumber) = row;
 }
 
-int64_t Matrix::getNumber(uint16_t row, uint16_t col) const{
+ZNumber Matrix::getNumber(uint16_t row, uint16_t col) const{
 	return matrix.at(row).at(col);
 }
 
@@ -99,7 +94,7 @@ bool Matrix::isSquare() const{
 }
 
 void Matrix::transpose(){
-	vector<vector<int64_t>> mCopy = matrix;
+	vector<vector<ZNumber>> mCopy = matrix;
 	matrix.clear();
 	matrix.resize(mCopy.front().size());
 	for(auto &row : matrix)
@@ -110,7 +105,7 @@ void Matrix::transpose(){
 			matrix.at(j).at(i) = mCopy.at(i).at(j);
 }
 
-void Matrix::replaceCol(uint16_t colNumber, const vector<int64_t> &col){
+void Matrix::replaceCol(uint16_t colNumber, const vector<ZNumber> &col){
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 	if(matrix.size() != col.size())
@@ -120,13 +115,13 @@ void Matrix::replaceCol(uint16_t colNumber, const vector<int64_t> &col){
 		matrix.at(i).at(colNumber) = col.at(i);
 }
 
-vector<int64_t> Matrix::getCol(uint16_t colNumber) const{
+vector<ZNumber> Matrix::getCol(uint16_t colNumber) const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 	if(colNumber >= matrix.front().size())
 		throw runtime_error("colNumber is too high");
 
-	vector<int64_t> col(matrix.size());
+	vector<ZNumber> col(matrix.size());
 	for(uint16_t i = 0; i < matrix.size(); ++i)
 		col.at(i) = matrix.at(i).at(colNumber);
 	return col;
@@ -145,7 +140,7 @@ Matrix Matrix::getSubMatrix(uint16_t rowNumber, uint16_t colNumber) const{
 
 	for(uint16_t row = 0; row < rowCount; ++row){
 		if(row != rowNumber){
-			vector<int64_t> currentRow;
+			vector<ZNumber> currentRow;
 			currentRow.reserve(rowCount - 1);
 			for(uint16_t col = 0; col < colCount; ++col)
 				if(col != colNumber)
@@ -157,14 +152,14 @@ Matrix Matrix::getSubMatrix(uint16_t rowNumber, uint16_t colNumber) const{
 }
 
 
-int64_t Matrix::calcDeterminant() const{
+ZNumber Matrix::calcDeterminant() const{
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square");
 
 	if(getRowCount() == 2)
 		return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
 
-	int64_t res = 0;
+	ZNumber res;
 	int sign = 1;
 	uint16_t colCount = getColumnCount();
 	for(uint16_t col = 0; col < colCount; ++col){
@@ -175,13 +170,13 @@ int64_t Matrix::calcDeterminant() const{
 }
 
 
-vector<int64_t> Matrix::solveLinearEquasionSystem_Kramer() const{
+vector<ZNumber> Matrix::solveLinearEquasionSystem_Kramer() const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 	if(matrix.size() < getColumnCount() - 1)
 		throw logic_error("Not enough equasions");
 
-	vector<int64_t> coords(getColumnCount() - 1);
+	vector<ZNumber> coords(getColumnCount() - 1);
 
 	Matrix mCopy(*this);
 	mCopy.resize(this->getColumnCount() - 1, this->getColumnCount() - 1);//отбрасываем лишние уравнения
@@ -192,13 +187,13 @@ vector<int64_t> Matrix::solveLinearEquasionSystem_Kramer() const{
 
 
 
-	vector<int64_t> lastCol = this->getCol(this->getColumnCount() - 1);
+	vector<ZNumber> lastCol = this->getCol(this->getColumnCount() - 1);
 	lastCol.resize(mCopy.getRowCount());
 	for(auto &lastN : lastCol)
 		lastN = -lastN;
 
 	for(uint16_t i = 0; i < mCopy.getColumnCount(); ++i){
-		vector<int64_t> temp = mCopy.getCol(i);
+		vector<ZNumber> temp = mCopy.getCol(i);
 		mCopy.replaceCol(i, lastCol);
 		coords.at(i) = mCopy.calcDeterminant() / dividerDet;
 		mCopy.replaceCol(i, temp);
@@ -206,8 +201,8 @@ vector<int64_t> Matrix::solveLinearEquasionSystem_Kramer() const{
 	return coords;
 }
 
-
-vector<int64_t> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
+/*
+vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 
@@ -215,19 +210,19 @@ vector<int64_t> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	if(matrix.size() < K)
 		throw logic_error("Not enough equasions");
 
-	vector<int64_t> coords(K);
-	vector<int64_t> lastCol = this->getCol(K);
+	vector<ZNumber> coords(K);
+	vector<ZNumber> lastCol = this->getCol(K);
 
 	Matrix mCopy(*this);
 	mCopy.resize(K, K);
-	int64_t mainDeterminant = mCopy.calcDeterminant();
+	ZNumber mainDeterminant = mCopy.calcDeterminant();
 	if(mainDeterminant == 0)
 		throw logic_error("Determinant == 0");
 
 
 	Matrix cofactors;
 	for(uint16_t rowNumber = 0; rowNumber < K; ++rowNumber){
-		vector<int64_t> cofactorRow(K);
+		vector<ZNumber> cofactorRow(K);
 		for(uint16_t colNumber = 0; colNumber < K; ++colNumber)
 			cofactorRow.at(colNumber) = mCopy.getSubMatrix(rowNumber, colNumber).calcDeterminant() * ((rowNumber + colNumber) % 2 ? -1 : 1) % module;
 		cofactors.insertRow(cofactorRow);
@@ -245,14 +240,14 @@ vector<int64_t> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 
 	return result.getCol(0);
 }
+*/
 
-
-vector<int64_t> Matrix::getFlatPolynomial() const{
+vector<ZNumber> Matrix::getFlatPolynomial() const{
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square.");
 
 	size_t K = getRowCount();
-	vector<int64_t> factors(K + 1);
+	vector<ZNumber> factors(K + 1);
 	factors.back() = 0;
 
 	int sign = 1;
@@ -270,7 +265,7 @@ vector<int64_t> Matrix::getFlatPolynomial() const{
 Matrix Matrix::operator*(const Matrix &m) const{
 	Matrix result;
 	for(uint16_t rowNumber = 0; rowNumber < this->getRowCount(); ++rowNumber){
-		vector<int64_t> row(m.getColumnCount(), 0);
+		vector<ZNumber> row(m.getColumnCount());
 		for(uint16_t colNumber = 0; colNumber < m.getColumnCount(); ++colNumber)
 			row.at(colNumber) = sum(this->getRow(rowNumber) * m.getCol(colNumber));
 		result.insertRow(row);
@@ -284,7 +279,7 @@ Matrix Matrix::operator*=(const Matrix &m){
 }
 
 
-Matrix Matrix::operator*(const int64_t val) const{
+Matrix Matrix::operator*(const ZNumber val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
@@ -292,7 +287,7 @@ Matrix Matrix::operator*(const int64_t val) const{
 	return mCopy;
 }
 
-Matrix Matrix::operator/(const int64_t val) const{
+Matrix Matrix::operator/(const ZNumber val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
@@ -300,12 +295,12 @@ Matrix Matrix::operator/(const int64_t val) const{
 	return mCopy;
 }
 
-Matrix Matrix::operator*=(const int64_t val){
+Matrix Matrix::operator*=(const ZNumber val){
 	*this = *this * val;
 	return *this;
 }
 
-Matrix Matrix::operator/=(const int64_t val){
+Matrix Matrix::operator/=(const ZNumber val){
 	*this = *this / val;
 	return *this;
 }
@@ -329,26 +324,26 @@ ostream &operator<<(ostream &o, const Matrix &matrix){
 
 
 
-ostream &operator<<(ostream &o, const vector<int64_t> &v){
+ostream &operator<<(ostream &o, const vector<ZNumber> &v){
 	for(auto &n : v)
 		o << n << " ";
 	return o;
 }
 
 
-vector<int64_t> operator*(const vector<int64_t> &v1, const vector<int64_t> &v2){
+vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
 	if(v1.size() != v2.size())
 		throw logic_error("Vector size does not match");
-	vector<int64_t> res(v1.size());
+	vector<ZNumber> res(v1.size());
 	for(uint16_t i = 0; i < res.size(); ++i)
-		res.at(i) = v1.at(i) * v2.at(i) % module;
+		res.at(i) = v1.at(i) * v2.at(i);
 	return res;
 }
 
-int64_t sum(const vector<int64_t> &v){
+int64_t sum(const vector<ZNumber> &v){
 	int64_t res = 0;
 	for(auto &value : v)
-		res = res + value % module;
+		res = res + value;
 	return res;
 }
 

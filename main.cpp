@@ -6,15 +6,17 @@
 #include <chrono>
 #include <random>
 
+#include "config.hpp"
+#include "ZNumber.hpp"
 #include "Matrix.h"
 #include "FlatEquasion.h"
 
 using namespace std;
 
 
-bool checkSecret(const vector<int64_t> &secret){
+bool checkSecret(const vector<ZNumber> &secret){
 	for(auto &coord : secret)
-		if(coord != 0)
+		if(coord != ZNumber(0))
 			return true;
 	return false;
 }
@@ -27,10 +29,10 @@ int main(){
 
 
 
-	vector<int64_t> secret(K);
+	vector<ZNumber> secret(K);
 	do{
 		for(auto &coord : secret)
-			coord = g1() % module;
+			coord = g1();
 	}while(checkSecret(secret) == false);
 
 
@@ -41,7 +43,7 @@ int main(){
 		do{
 			matrix.at(i).randomize();
 			matrix.at(i).replaceRow(0, secret);
-		}while(matrix.at(i).calcDeterminant() == 0);
+		}while(matrix.at(i).calcDeterminant() == ZNumber(0));
 		cout << matrix.at(i) << endl;
 	}
 
@@ -53,7 +55,7 @@ int main(){
 
 
 	cout << res << endl;
-	vector<int64_t> coords = res.solveLinearEquasionSystem_MatrixMethod();
+	vector<ZNumber> coords = res.solveLinearEquasionSystem_Kramer();
 
 
 	if(coords == secret)

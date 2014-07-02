@@ -3,6 +3,8 @@
 #include <stdexcept>
 
 
+#include "config.hpp"
+#include "ZNumber.hpp"
 #include "Matrix.h"
 
 #include "FlatEquasion.h"
@@ -21,17 +23,17 @@ void FlatEquasion::getMatrix(const Matrix &matrix){
 	size_t K = matrix.getRowCount();
 
 	factors.resize(K + 1);
-	factors.at(K) = 0;
+	factors.back() = 0;
 
 	int sign = 1;
 	for(uint16_t i = 0; i < K; ++i){
 		factors.at(i) = sign * matrix.getSubMatrix(0, i).calcDeterminant();
-		factors.at(K) -= matrix.getNumber(0, i) * factors.at(i);
+		factors.back() -= matrix.getNumber(0, i) * factors.at(i);
 		sign = -sign;
 	}
 }
 
-vector<int64_t> FlatEquasion::getPolynomial() const{
+vector<ZNumber> FlatEquasion::getPolynomial() const{
 	return factors;
 }
 
@@ -39,8 +41,8 @@ vector<int64_t> FlatEquasion::getPolynomial() const{
 ostream &operator<<(ostream &o, const FlatEquasion &fe){
 	uint16_t K = fe.factors.size() - 1;
 	for(uint16_t i = 0; i < K; ++i)
-		o << abs(fe.factors.at(i)) << " * X" << i + 1 << (fe.factors.at(i + 1) >= 0 ? " + " : " - ");
-	o << abs(fe.factors.at(K)) << " = 0";
+		o << fe.factors.at(i) << " * X" << i + 1 << " + ";
+	o << fe.factors.at(K) << " = 0";
 	return o;
 }
 
