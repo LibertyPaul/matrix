@@ -1,13 +1,15 @@
 #include <vector>
 #include <stdexcept>
+#include <istream>
 #include <ostream>
 #include <sstream>
 #include <chrono>
 #include <random>
 
+using namespace std;
 #include "config.hpp"
 #include "ZNumber.hpp"
-#include "Matrix.h"
+#include "Matrix.hpp"
 
 Matrix::Matrix(){
 }
@@ -159,7 +161,7 @@ ZNumber Matrix::calcDeterminant() const{
 	if(getRowCount() == 2)
 		return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
 
-	ZNumber res;
+	ZNumber res(0);
 	int sign = 1;
 	uint16_t colCount = getColumnCount();
 	for(uint16_t col = 0; col < colCount; ++col){
@@ -181,7 +183,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_Kramer() const{
 	Matrix mCopy(*this);
 	mCopy.resize(this->getColumnCount() - 1, this->getColumnCount() - 1);//отбрасываем лишние уравнения
 
-	int64_t dividerDet = mCopy.calcDeterminant();
+	ZNumber dividerDet = mCopy.calcDeterminant();
 	if(dividerDet == 0)
 		throw logic_error("divider == 0");
 
@@ -201,7 +203,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_Kramer() const{
 	return coords;
 }
 
-/*
+
 vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
@@ -223,8 +225,12 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	Matrix cofactors;
 	for(uint16_t rowNumber = 0; rowNumber < K; ++rowNumber){
 		vector<ZNumber> cofactorRow(K);
-		for(uint16_t colNumber = 0; colNumber < K; ++colNumber)
-			cofactorRow.at(colNumber) = mCopy.getSubMatrix(rowNumber, colNumber).calcDeterminant() * ((rowNumber + colNumber) % 2 ? -1 : 1) % module;
+		for(uint16_t colNumber = 0; colNumber < K; ++colNumber){
+			int sign = 1;
+			if((rowNumber + colNumber) % 2)
+				sign = -1;
+			cofactorRow.at(colNumber) = mCopy.getSubMatrix(rowNumber, colNumber).calcDeterminant() * sign;
+		}
 		cofactors.insertRow(cofactorRow);
 	}
 
@@ -240,7 +246,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 
 	return result.getCol(0);
 }
-*/
+
 
 vector<ZNumber> Matrix::getFlatPolynomial() const{
 	if(isSquare() == false)
@@ -252,8 +258,8 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 
 	int sign = 1;
 	for(uint16_t i = 0; i < K; ++i){
-		factors.at(i) = sign * getSubMatrix(0, i).calcDeterminant() % module;
-		factors.back() = (factors.back() - getNumber(0, i) * factors.at(i) % module) % module;
+		factors.at(i) = sign * getSubMatrix(0, i).calcDeterminant();
+		factors.back() = factors.back() - getNumber(0, i) * factors.at(i);
 		sign = -sign;
 	}
 	return factors;
@@ -283,7 +289,7 @@ Matrix Matrix::operator*(const ZNumber val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
-			coord = val * coord % module;
+			coord = val * coord;
 	return mCopy;
 }
 
@@ -291,7 +297,7 @@ Matrix Matrix::operator/(const ZNumber val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
-			coord = coord / val % module;
+			coord = coord / val;
 	return mCopy;
 }
 

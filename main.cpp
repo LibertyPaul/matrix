@@ -1,16 +1,16 @@
 #include <iostream>
 #include <vector>
+#include <istream>
 #include <ostream>
 #include <algorithm>
 
 #include <chrono>
 #include <random>
 
+using namespace std;
 #include "config.hpp"
 #include "ZNumber.hpp"
-#include "Matrix.h"
-#include "FlatEquasion.h"
-
+#include "Matrix.hpp"
 using namespace std;
 
 
@@ -55,7 +55,7 @@ int main(){
 
 
 	cout << res << endl;
-	vector<ZNumber> coords = res.solveLinearEquasionSystem_Kramer();
+	vector<ZNumber> coords = res.solveLinearEquasionSystem_MatrixMethod();
 
 
 	if(coords == secret)
