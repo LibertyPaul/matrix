@@ -2,7 +2,6 @@
 #include <ostream>
 
 using namespace std;
-#include "config.hpp"
 #include "ZNumber.hpp"
 
 

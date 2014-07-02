@@ -2,8 +2,8 @@
 #define ZNUMBER_HPP_INCLUDED
 
 
-
 class ZNumber{
+	static const uint32_t module = 7;
 	uint32_t n;
 public:
 	ZNumber(int64_t n = 0);

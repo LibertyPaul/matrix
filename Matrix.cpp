@@ -7,7 +7,6 @@
 #include <random>
 
 using namespace std;
-#include "config.hpp"
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
 
