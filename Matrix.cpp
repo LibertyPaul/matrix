@@ -101,6 +101,8 @@ uint16_t Matrix::getColumnCount() const{
 
 
 bool Matrix::isSquare() const{
+	if(matrix.empty())
+		throw runtime_error("Matrix is empty");
 	return matrix.size() == matrix.front().size();
 }
 
@@ -167,17 +169,21 @@ ZNumber Matrix::calcDeterminant() const{
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square");
 
-	if(getRowCount() == 2)
-		return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
+	switch(getRowCount()){
+		case 1: return matrix.at(0).at(0);
+		case 2: return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
 
-	ZNumber res(0);
-	int sign = 1;
-	uint16_t colCount = getColumnCount();
-	for(uint16_t col = 0; col < colCount; ++col){
-		res += sign * matrix.front().at(col) * getSubMatrix(0, col).calcDeterminant();//heavy call
-		sign = -sign;
+		default: {
+			ZNumber res(0);
+			int sign = 1;
+			uint16_t colCount = getColumnCount();
+			for(uint16_t col = 0; col < colCount; ++col){
+				res += sign * matrix.front().at(col) * getSubMatrix(0, col).calcDeterminant();//heavy call
+				sign = -sign;
+			}
+			return res;
+		}
 	}
-	return res;
 }
 
 

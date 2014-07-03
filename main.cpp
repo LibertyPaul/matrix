@@ -25,19 +25,17 @@ bool checkSecret(const vector<ZNumber> &secret){
 int main(){
 	unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
 	mt19937 g1(seed1);
-	const uint16_t K = 3;
+	const uint16_t K = 2;
 
 
 
-	vector<ZNumber> secret = {
-		{5, 4, 6}
-	};
-	/*do{
+	vector<ZNumber> secret(K);
+	do{
 		for(auto &coord : secret)
 			coord = g1();
-	}while(checkSecret(secret) == false);*/
+	}while(checkSecret(secret) == false);
 
-/*
+
 
 	vector<Matrix> matrix(K);
 	for(size_t i = 0; i < K; ++i){
@@ -49,37 +47,7 @@ int main(){
 		cout << matrix.at(i) << endl;
 	}
 
-	matrix = {{
-		{
-			secret,
-			{1, 5, 1},
-			{4, 0, 5}
-		},
-		{
-			secret,
-			{5, 3, 4},
-			{0, 4, 4}
-		},
-		{
-			secret,
-			{4, 3, 0},
-			{5, 0, 4}
-		}
-	}};
-
-	*/
-
-	Matrix test = {{
-		{5, 4, 6},
-		{1, 5, 1},
-		{4, 0, 5}
-	}};
-
-
-	cout << test << endl << test.getFlatPolynomial() << endl;
-
-
-/*	Matrix res;
+	Matrix res;
 	for(auto &m : matrix)
 		res.insertRow(m.getFlatPolynomial());
 
@@ -92,6 +60,6 @@ int main(){
 		cout << "success" << endl;
 	else
 		cout << "fail: " << secret << " != " << coords << endl;
-*/
+
 
 }
