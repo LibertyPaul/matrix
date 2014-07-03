@@ -7,10 +7,11 @@ public:
 	Matrix();
 	Matrix(uint16_t rowNumber, uint16_t colNumber);
 	Matrix(const vector<vector<ZNumber>> &matrix);
+	Matrix(const initializer_list<vector<ZNumber>> &initList);
 
 
 	void resize(uint16_t rowNumber, uint16_t colNumber);
-	void randomize(int64_t maxValue = module);
+	void randomize();
 
 	void insertRow(const vector<ZNumber> &row);
 	vector<ZNumber> getCol(uint16_t colNumber) const;
@@ -38,6 +39,9 @@ public:
 	Matrix operator/=(const ZNumber val);
 
 
+	const Matrix &operator=(const Matrix &matrix);
+	const vector<vector<ZNumber>> &operator=(const vector<vector<ZNumber>> &matrix);
+
 	friend ostream &operator<<(ostream &o, const Matrix &matrix);
 };
 
@@ -45,8 +49,6 @@ ostream &operator<<(ostream &o, const Matrix &matrix);
 
 
 
-ostream &operator<<(ostream &o, const vector<ZNumber> &v);
-vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
-int64_t sum(const vector<ZNumber> &v);
+
 
 #endif // MATRIX_HPP_INCLUDED

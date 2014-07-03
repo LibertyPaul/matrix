@@ -5,6 +5,7 @@
 #include <sstream>
 #include <chrono>
 #include <random>
+#include <initializer_list>
 
 using namespace std;
 #include "ZNumber.hpp"
@@ -24,6 +25,13 @@ Matrix::Matrix(const vector<vector<ZNumber>> &matrix){
 	this->matrix = matrix;
 }
 
+Matrix::Matrix(const initializer_list<vector<ZNumber>> &initList): matrix(initList){
+	for(auto i = matrix.begin(); i != matrix.end() - 1; ++i)
+		if(i->size() != (i + 1)->size())
+			throw logic_error("Row size does not match");
+}
+
+
 
 void Matrix::resize(uint16_t rowNumber, uint16_t colNumber){
 	matrix.resize(rowNumber);
@@ -31,7 +39,7 @@ void Matrix::resize(uint16_t rowNumber, uint16_t colNumber){
 		row.resize(colNumber);
 }
 
-void Matrix::randomize(int64_t maxValue){
+void Matrix::randomize(){
 	unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
 	mt19937 g1(seed1);
 	for(auto &row : matrix)
@@ -226,7 +234,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 		vector<ZNumber> cofactorRow(K);
 		for(uint16_t colNumber = 0; colNumber < K; ++colNumber){
 			int sign = 1;
-			if((rowNumber + colNumber) % 2)
+			if((rowNumber + colNumber) % 2 != 0)
 				sign = -1;
 			cofactorRow.at(colNumber) = mCopy.getSubMatrix(rowNumber, colNumber).calcDeterminant() * sign;
 		}
@@ -258,7 +266,7 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 	int sign = 1;
 	for(uint16_t i = 0; i < K; ++i){
 		factors.at(i) = sign * getSubMatrix(0, i).calcDeterminant();
-		factors.back() = factors.back() - getNumber(0, i) * factors.at(i);
+		factors.back() -= getNumber(0, i) * factors.at(i);//??sign *
 		sign = -sign;
 	}
 	return factors;
@@ -311,46 +319,32 @@ Matrix Matrix::operator/=(const ZNumber val){
 }
 
 
+const Matrix &Matrix::operator=(const Matrix &matrix){
+	this->matrix = matrix.matrix;
+	return matrix;
+}
+
+const vector<vector<ZNumber>> &Matrix::operator=(const vector<vector<ZNumber>> &matrix){
+	this->matrix = matrix;
+	return matrix;
+}
+
+
+
+
+
+
 ostream &operator<<(ostream &o, const Matrix &matrix){
-	for(auto &row : matrix.matrix){
-		for(auto &n : row)
-			o << n << " ";
-		o << endl;
-	}
-	return o;
-
-}
-
-
-
-
-
-
-
-
-
-ostream &operator<<(ostream &o, const vector<ZNumber> &v){
-	for(auto &n : v)
-		o << n << " ";
+	for(auto &row : matrix.matrix)
+		o << row << endl;
 	return o;
 }
 
 
-vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
-	if(v1.size() != v2.size())
-		throw logic_error("Vector size does not match");
-	vector<ZNumber> res(v1.size());
-	for(uint16_t i = 0; i < res.size(); ++i)
-		res.at(i) = v1.at(i) * v2.at(i);
-	return res;
-}
 
-int64_t sum(const vector<ZNumber> &v){
-	int64_t res = 0;
-	for(auto &value : v)
-		res = res + value;
-	return res;
-}
+
+
+
 
 
 

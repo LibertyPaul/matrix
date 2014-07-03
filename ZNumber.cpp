@@ -1,5 +1,7 @@
 #include <istream>
 #include <ostream>
+#include <vector>
+#include <stdexcept>
 
 using namespace std;
 #include "ZNumber.hpp"
@@ -183,6 +185,32 @@ istream &operator>>(istream &i, const ZNumber &zn){
 
 
 
+
+
+
+ostream &operator<<(ostream &o, const vector<ZNumber> &v){
+	for(auto &n : v)
+		o << n << " ";
+	return o;
+}
+
+
+vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
+	if(v1.size() != v2.size())
+		throw logic_error("Vector size does not match");
+
+	vector<ZNumber> res(v1.size());
+	for(uint16_t i = 0; i < res.size(); ++i)
+		res.at(i) = v1.at(i) * v2.at(i);
+	return res;
+}
+
+ZNumber sum(const vector<ZNumber> &v){
+	ZNumber res = 0;
+	for(auto &value : v)
+		res = res + value;
+	return res;
+}
 
 
 

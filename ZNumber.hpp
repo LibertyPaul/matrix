@@ -40,7 +40,7 @@ public:
 	bool operator||(const ZNumber &zn) const;
 
 
-	friend ZNumber operator-(const ZNumber &zn);
+	friend ZNumber operator-(const ZNumber &zn);//унарный минус (-n)
 
 	friend int64_t operator+(const int64_t &n, const ZNumber &zn);
 	friend int64_t operator-(const int64_t &n, const ZNumber &zn);
@@ -62,6 +62,12 @@ int64_t operator%(const int64_t &n, const ZNumber &zn);
 
 ostream &operator<<(ostream &o, const ZNumber &zn);
 istream &operator>>(istream &i, const ZNumber &zn);
+
+
+
+ostream &operator<<(ostream &o, const vector<ZNumber> &v);
+vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
+ZNumber sum(const vector<ZNumber> &v);
 
 
 #endif // ZNUMBER_HPP_INCLUDED
