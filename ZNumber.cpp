@@ -43,33 +43,33 @@ ZNumber ZNumber::operator%(const ZNumber &zn) const{
 	return this->n % zn.n;
 }
 
-ZNumber &ZNumber::operator=(const ZNumber &zn){
+const ZNumber &ZNumber::operator=(const ZNumber &zn){
 	this->n = zn.n;
 	return *this;
 }
 
-ZNumber ZNumber::operator+=(const ZNumber &zn){
+const ZNumber &ZNumber::operator+=(const ZNumber &zn){
 	*this = *this + zn;
 	return *this;
 }
 
 
-ZNumber ZNumber::operator-=(const ZNumber &zn){
+const ZNumber &ZNumber::operator-=(const ZNumber &zn){
 	*this = *this - zn;
 	return *this;
 }
 
-ZNumber ZNumber::operator*=(const ZNumber &zn){
+const ZNumber &ZNumber::operator*=(const ZNumber &zn){
 	*this = *this * zn;
 	return *this;
 }
 
-ZNumber ZNumber::operator/=(const ZNumber &zn){
+const ZNumber &ZNumber::operator/=(const ZNumber &zn){
 	*this = *this / zn;
 	return *this;
 }
 
-ZNumber ZNumber::operator%=(const ZNumber &zn){
+const ZNumber &ZNumber::operator%=(const ZNumber &zn){
 	*this = *this % zn;
 	return *this;
 }

@@ -14,12 +14,12 @@ public:
 	ZNumber operator/(const ZNumber &zn) const;
 	ZNumber operator%(const ZNumber &zn) const;
 
-	ZNumber &operator=(const ZNumber &zn);
-	ZNumber operator+=(const ZNumber &zn);
-	ZNumber operator-=(const ZNumber &zn);
-	ZNumber operator*=(const ZNumber &zn);
-	ZNumber operator/=(const ZNumber &zn);
-	ZNumber operator%=(const ZNumber &zn);
+	const ZNumber &operator=(const ZNumber &zn);
+	const ZNumber &operator+=(const ZNumber &zn);
+	const ZNumber &operator-=(const ZNumber &zn);
+	const ZNumber &operator*=(const ZNumber &zn);
+	const ZNumber &operator/=(const ZNumber &zn);
+	const ZNumber &operator%=(const ZNumber &zn);
 
 
 	ZNumber operator++();
