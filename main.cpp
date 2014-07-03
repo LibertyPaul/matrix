@@ -76,7 +76,7 @@ int main(){
 	}};
 
 
-	cout << test.getFlatPolynomial() << endl;
+	cout << test << endl << test.getFlatPolynomial() << endl;
 
 
 /*	Matrix res;

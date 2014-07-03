@@ -7,6 +7,8 @@
 #include <random>
 #include <initializer_list>
 
+#include <iostream>
+
 using namespace std;
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
@@ -260,14 +262,18 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 		throw logic_error("Matrix is not square.");
 
 	size_t K = getRowCount();
+	Matrix mCopy(*this);
+	for(size_t col = 0; col < K; ++col)
+		for(size_t row = 1; row < K; ++row)
+			mCopy.matrix.at(row).at(col) -= mCopy.matrix.at(0).at(col);
+
 	vector<ZNumber> factors(K + 1);
 	factors.back() = 0;
 
 	int sign = 1;
 	for(uint16_t i = 0; i < K; ++i){
-		Matrix subMatrix = getSubMatrix(0, i) - getNumber(0, i);
-		factors.at(i) = sign * subMatrix.calcDeterminant();
-		factors.back() -= getNumber(0, i) * factors.at(i);//??sign *
+		factors.at(i) = sign * mCopy.getSubMatrix(0, i).calcDeterminant();
+		factors.back() -= mCopy.getNumber(0, i) * factors.at(i);//??sign *
 		sign = -sign;
 	}
 	return factors;
