@@ -11,7 +11,7 @@ ZNumber::ZNumber(int64_t n){
 	if(n >= module)
 		 n %= module;
 	if(n < 0)
-		n = module - (n % module);
+		n = module - (-n % module);
 
 	this->n = n;
 }
@@ -24,13 +24,7 @@ ZNumber ZNumber::operator+(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator-(const ZNumber &zn) const{
-	int64_t res = this->n - zn.n;
-	if(res >= module)
-		res %= module;
-	if(res < 0)
-		res = module - res;
-
-	return res;
+	return *this + (-zn);
 }
 
 ZNumber ZNumber::operator*(const ZNumber &zn) const{
@@ -144,12 +138,16 @@ bool ZNumber::operator||(const ZNumber &zn) const{
 }
 
 
-
+/*
 
 ZNumber operator-(const ZNumber &zn){
-	return ZNumber(-zn.n);
+	return ZNumber(module - (zn.n % module));
 }
+*/
 
+ZNumber ZNumber::operator-() const{
+	return ZNumber(module - (n % module));
+}
 
 
 

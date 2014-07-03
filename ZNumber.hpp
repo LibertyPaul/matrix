@@ -40,7 +40,8 @@ public:
 	bool operator||(const ZNumber &zn) const;
 
 
-	friend ZNumber operator-(const ZNumber &zn);//унарный минус (-n)
+	//friend ZNumber operator-(const ZNumber &zn);//унарный минус (-n)
+	ZNumber operator-() const;
 
 	friend int64_t operator+(const int64_t &n, const ZNumber &zn);
 	friend int64_t operator-(const int64_t &n, const ZNumber &zn);
@@ -52,7 +53,7 @@ public:
 	friend istream &operator>>(istream &i, const ZNumber &zn);
 };
 
-ZNumber operator-(const ZNumber &zn);
+//ZNumber operator-(const ZNumber &zn);
 
 int64_t operator+(const int64_t &n, const ZNumber &zn);
 int64_t operator-(const int64_t &n, const ZNumber &zn);
