@@ -265,7 +265,8 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 
 	int sign = 1;
 	for(uint16_t i = 0; i < K; ++i){
-		factors.at(i) = sign * getSubMatrix(0, i).calcDeterminant();
+		Matrix subMatrix = getSubMatrix(0, i) - getNumber(0, i);
+		factors.at(i) = sign * subMatrix.calcDeterminant();
 		factors.back() -= getNumber(0, i) * factors.at(i);//??sign *
 		sign = -sign;
 	}
@@ -292,7 +293,7 @@ Matrix Matrix::operator*=(const Matrix &m){
 }
 
 
-Matrix Matrix::operator*(const ZNumber val) const{
+Matrix Matrix::operator*(const ZNumber &val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
@@ -300,7 +301,7 @@ Matrix Matrix::operator*(const ZNumber val) const{
 	return mCopy;
 }
 
-Matrix Matrix::operator/(const ZNumber val) const{
+Matrix Matrix::operator/(const ZNumber &val) const{
 	Matrix mCopy(*this);
 	for(auto &row : mCopy.matrix)
 		for(auto &coord : row)
@@ -308,12 +309,12 @@ Matrix Matrix::operator/(const ZNumber val) const{
 	return mCopy;
 }
 
-Matrix Matrix::operator*=(const ZNumber val){
+Matrix Matrix::operator*=(const ZNumber &val){
 	*this = *this * val;
 	return *this;
 }
 
-Matrix Matrix::operator/=(const ZNumber val){
+Matrix Matrix::operator/=(const ZNumber &val){
 	*this = *this / val;
 	return *this;
 }
@@ -330,8 +331,30 @@ const vector<vector<ZNumber>> &Matrix::operator=(const vector<vector<ZNumber>> &
 }
 
 
+Matrix Matrix::operator+(const ZNumber &val) const{
+	Matrix t(*this);
+	for(auto &row : t.matrix)
+		for(auto &zn : row)
+			zn += val;
+	return t;
+}
 
 
+Matrix Matrix::operator-(const ZNumber &val)const{
+	return Matrix(*this) + (-val);
+}
+
+
+Matrix Matrix::operator+=(const ZNumber &val){
+	*this = *this + val;
+	return *this;
+}
+
+
+Matrix Matrix::operator-=(const ZNumber &val){
+	*this += -val;
+	return *this;
+}
 
 
 ostream &operator<<(ostream &o, const Matrix &matrix){

@@ -40,7 +40,7 @@ int main(){
 /*
 
 	vector<Matrix> matrix(K);
-	/*for(size_t i = 0; i < K; ++i){
+	for(size_t i = 0; i < K; ++i){
 		matrix.at(i).resize(K, K);
 		do{
 			matrix.at(i).randomize();
@@ -70,7 +70,7 @@ int main(){
 	*/
 
 	Matrix test = {{
-		secret,
+		{5, 4, 6},
 		{1, 5, 1},
 		{4, 0, 5}
 	}};

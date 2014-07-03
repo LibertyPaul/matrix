@@ -33,10 +33,16 @@ public:
 
 	Matrix operator*(const Matrix &matrix) const;//N^3. надо бы переписать под алгоритм Штрассена
 	Matrix operator*=(const Matrix &m);
-	Matrix operator*(const ZNumber val) const;
-	Matrix operator/(const ZNumber val) const;
-	Matrix operator*=(const ZNumber val);
-	Matrix operator/=(const ZNumber val);
+	Matrix operator*(const ZNumber &val) const;
+	Matrix operator/(const ZNumber &val) const;
+	Matrix operator*=(const ZNumber &val);
+	Matrix operator/=(const ZNumber &val);
+
+	Matrix operator+(const ZNumber &val) const;
+	Matrix operator-(const ZNumber &val) const;
+	Matrix operator+=(const ZNumber &val);
+	Matrix operator-=(const ZNumber &val);
+
 
 
 	const Matrix &operator=(const Matrix &matrix);
