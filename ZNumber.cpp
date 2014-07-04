@@ -36,7 +36,9 @@ ZNumber ZNumber::operator*(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator/(const ZNumber &zn) const{
-	return this->n / zn.n;
+	int32_t d, x, y;
+	GCD_ext(zn.n, module, d, x, y);//хз как, но оно работает
+	return *this * x;
 }
 
 ZNumber ZNumber::operator%(const ZNumber &zn) const{
@@ -138,13 +140,6 @@ bool ZNumber::operator||(const ZNumber &zn) const{
 }
 
 
-/*
-
-ZNumber operator-(const ZNumber &zn){
-	return ZNumber(module - (zn.n % module));
-}
-*/
-
 ZNumber ZNumber::operator-() const{
 	return ZNumber(module - (n % module));
 }
@@ -209,6 +204,22 @@ ZNumber sum(const vector<ZNumber> &v){
 		res = res + value;
 	return res;
 }
+
+
+
+void GCD_ext(int32_t a, int32_t b, int32_t &d, int32_t &x, int32_t &y){
+	if(b == 0){
+		d = a;
+		x = 1;
+		y = 0;
+		return;
+	}
+	GCD_ext(b, a % b, d, x, y);
+	uint32_t t = y;
+	y = x - (a / b) * y;
+	x = t;
+}
+
 
 
 

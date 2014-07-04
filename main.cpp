@@ -25,7 +25,7 @@ bool checkSecret(const vector<ZNumber> &secret){
 int main(){
 	unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
 	mt19937 g1(seed1);
-	const uint16_t K = 2;
+	const uint16_t K = 5;
 
 
 
@@ -34,7 +34,6 @@ int main(){
 		for(auto &coord : secret)
 			coord = g1();
 	}while(checkSecret(secret) == false);
-
 
 
 	vector<Matrix> matrix(K);
@@ -46,6 +45,7 @@ int main(){
 		}while(matrix.at(i).calcDeterminant() == ZNumber(0));
 		cout << matrix.at(i) << endl;
 	}
+
 
 	Matrix res;
 	for(auto &m : matrix)
