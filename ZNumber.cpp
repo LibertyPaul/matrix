@@ -105,12 +105,12 @@ bool ZNumber::operator!=(const ZNumber &zn) const{
 	return !(*this == zn);
 }
 
-bool ZNumber::operator>(const ZNumber &zn) const{
+bool ZNumber::operator<(const ZNumber &zn) const{
 	return this->n < zn.n;
 }
 
-bool ZNumber::operator<(const ZNumber &zn) const{
-	return this->n < zn.n;
+bool ZNumber::operator>(const ZNumber &zn) const{
+	return this->n > zn.n;
 }
 
 bool ZNumber::operator<=(const ZNumber &zn) const{
@@ -126,17 +126,11 @@ bool ZNumber::operator!() const{
 }
 
 bool ZNumber::operator&&(const ZNumber &zn) const{
-	if(this->n)
-		return zn.n;
-	else
-		return false;
+	return this->n && zn.n;
 }
 
 bool ZNumber::operator||(const ZNumber &zn) const{
-	if(this->n)
-		return true;
-	else
-		return zn.n;
+	return this->n || zn.n;
 }
 
 
@@ -197,6 +191,30 @@ vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
 		res.at(i) = v1.at(i) * v2.at(i);
 	return res;
 }
+
+vector<ZNumber> operator*(vector<ZNumber> v, const ZNumber &zn){
+	for(auto &n : v)
+		n *= zn;
+	return v;
+}
+
+vector<ZNumber> operator/(vector<ZNumber> v, const ZNumber &zn){
+	for(auto &n : v)
+		n /= zn;
+	return v;
+}
+
+
+vector<ZNumber> operator-=(vector<ZNumber> &zv1, const vector<ZNumber> &zv2){
+	if(zv1.size() != zv2.size())
+		throw logic_error("Vector size does not match");
+	uint32_t K = zv1.size();
+	for(uint32_t i = 0; i < K; ++i)
+		zv1.at(i) -= zv2.at(i);
+
+	return zv1;
+}
+
 
 ZNumber sum(const vector<ZNumber> &v){
 	ZNumber res = 0;

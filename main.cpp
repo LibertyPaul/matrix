@@ -25,7 +25,7 @@ bool checkSecret(const vector<ZNumber> &secret){
 int main(){
 	unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
 	mt19937 g1(seed1);
-	const uint16_t K = 5;
+	const uint16_t K = 3;
 
 
 
@@ -53,7 +53,7 @@ int main(){
 
 
 	cout << res << endl;
-	vector<ZNumber> coords = res.solveLinearEquasionSystem_Kramer();
+	vector<ZNumber> coords = res.solveLinearEquasionSystem_Gauss();
 
 
 	if(coords == secret)

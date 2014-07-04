@@ -16,7 +16,7 @@ using namespace std;
 Matrix::Matrix(){
 }
 
-Matrix::Matrix(uint16_t rowNumber, uint16_t colNumber){
+Matrix::Matrix(uint32_t rowNumber, uint32_t colNumber){
 	resize(rowNumber, colNumber);
 }
 
@@ -35,7 +35,7 @@ Matrix::Matrix(const initializer_list<vector<ZNumber>> &initList): matrix(initLi
 
 
 
-void Matrix::resize(uint16_t rowNumber, uint16_t colNumber){
+void Matrix::resize(uint32_t rowNumber, uint32_t colNumber){
 	matrix.resize(rowNumber);
 	for(auto &row : matrix)
 		row.resize(colNumber);
@@ -63,11 +63,15 @@ void Matrix::insertRow(const vector<ZNumber> &row){
 	matrix.push_back(move(newRow));
 }
 
-vector<ZNumber> Matrix::getRow(uint16_t rowNumber) const{
+vector<ZNumber> &Matrix::getRow(uint32_t rowNumber){
 	return matrix.at(rowNumber);
 }
 
-void Matrix::replaceRow(uint16_t rowNumber, const vector<ZNumber> &row){
+const vector<ZNumber> &Matrix::getRow(uint32_t rowNumber) const{
+	return matrix.at(rowNumber);
+}
+
+void Matrix::replaceRow(uint32_t rowNumber, const vector<ZNumber> &row){
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 
@@ -83,17 +87,17 @@ void Matrix::replaceRow(uint16_t rowNumber, const vector<ZNumber> &row){
 	matrix.at(rowNumber) = row;
 }
 
-ZNumber Matrix::getNumber(uint16_t row, uint16_t col) const{
+ZNumber &Matrix::getValue(uint32_t row, uint32_t col){
 	return matrix.at(row).at(col);
 }
 
 
-uint16_t Matrix::getRowCount() const{
+uint32_t Matrix::getRowCount() const{
 	return matrix.size();
 }
 
 
-uint16_t Matrix::getColumnCount() const{
+uint32_t Matrix::getColumnCount() const{
 	if(matrix.empty())
 		return 0;
 	return matrix.front().size();
@@ -113,35 +117,35 @@ void Matrix::transpose(){
 	for(auto &row : matrix)
 		row.resize(mCopy.size());
 
-	for(uint16_t i = 0; i < mCopy.size(); ++i)
-		for(uint16_t j = 0; j < mCopy.at(i).size(); ++j)
+	for(uint32_t i = 0; i < mCopy.size(); ++i)
+		for(uint32_t j = 0; j < mCopy.at(i).size(); ++j)
 			matrix.at(j).at(i) = mCopy.at(i).at(j);
 }
 
-void Matrix::replaceCol(uint16_t colNumber, const vector<ZNumber> &col){
+void Matrix::replaceCol(uint32_t colNumber, const vector<ZNumber> &col){
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 	if(matrix.size() != col.size())
 		throw logic_error("col size does not match");
 
-	for(uint16_t i = 0; i < matrix.size(); ++i)
+	for(uint32_t i = 0; i < matrix.size(); ++i)
 		matrix.at(i).at(colNumber) = col.at(i);
 }
 
-vector<ZNumber> Matrix::getCol(uint16_t colNumber) const{
+vector<ZNumber> Matrix::getCol(uint32_t colNumber) const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 	if(colNumber >= matrix.front().size())
 		throw runtime_error("colNumber is too high");
 
 	vector<ZNumber> col(matrix.size());
-	for(uint16_t i = 0; i < matrix.size(); ++i)
+	for(uint32_t i = 0; i < matrix.size(); ++i)
 		col.at(i) = matrix.at(i).at(colNumber);
 	return col;
 }
 
 
-Matrix Matrix::getSubMatrix(uint16_t rowNumber, uint16_t colNumber) const{
+Matrix Matrix::getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const{
 	uint16_t rowCount = getRowCount();
 	uint16_t colCount = getColumnCount();
 	if(colNumber >= colCount)
@@ -164,11 +168,28 @@ Matrix Matrix::getSubMatrix(uint16_t rowNumber, uint16_t colNumber) const{
 	return newMatrix;
 }
 
-
 ZNumber Matrix::calcDeterminant() const{
+	if(matrix.empty())
+		throw runtime_error("Matrix is empty");
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square");
 
+	return calcDeterminant_Gauss();
+}
+
+Matrix Matrix::getRowEchelonForm() const{
+	Matrix res(*this);
+	uint32_t K = res.getRowCount();
+	for(uint32_t col = 0; col < K - 1; ++col){
+		vector<ZNumber> subtrahend = res.getRow(col);
+		for(uint32_t row = col + 1; row < K; ++row)
+			res.matrix.at(row) -= subtrahend * res.matrix.at(row).at(col) / subtrahend.at(col);
+	}
+	return res;
+}
+
+
+ZNumber Matrix::calcDeterminant_Laplace() const{
 	switch(getRowCount()){
 		case 1: return matrix.at(0).at(0);
 		case 2: return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
@@ -184,6 +205,36 @@ ZNumber Matrix::calcDeterminant() const{
 			return res;
 		}
 	}
+}
+
+
+ZNumber Matrix::calcDeterminant_Gauss() const{
+	Matrix mCopy = this->getRowEchelonForm();
+	ZNumber result = 1;
+	uint32_t K = mCopy.getRowCount();
+	for(uint32_t i = 0; i < K; ++i)
+		result *= mCopy.matrix.at(i).at(i);
+
+	return result;
+}
+
+
+vector<ZNumber> Matrix::solveLinearEquasionSystem_Gauss() const{
+	Matrix mCopy = this->getRowEchelonForm();
+	cout << mCopy << endl;
+	uint32_t K = mCopy.getRowCount();
+	for(uint32_t col = K - 1; col >= 1; --col){
+		vector<ZNumber> subtrahend = mCopy.getRow(col);
+		for(int64_t row = col - 1; row >= 0; --row)
+			mCopy.getRow(row) -= subtrahend * mCopy.getValue(row, col) / subtrahend.at(col);
+	}
+	cout << mCopy << endl;
+
+	vector<ZNumber> res(K);
+	for(uint32_t i = 0; i < K; ++i)
+		res.at(i) = mCopy.getValue(i, i) / mCopy.getValue(i, K);
+
+	return res;
 }
 
 
@@ -209,7 +260,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_Kramer() const{
 	for(auto &lastN : lastCol)
 		lastN = -lastN;
 
-	for(uint16_t i = 0; i < mCopy.getColumnCount(); ++i){
+	for(uint32_t i = 0; i < mCopy.getColumnCount(); ++i){
 		vector<ZNumber> temp = mCopy.getCol(i);
 		mCopy.replaceCol(i, lastCol);
 		coords.at(i) = mCopy.calcDeterminant() / dividerDet;
@@ -223,7 +274,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty");
 
-	uint16_t K = getColumnCount() - 1;
+	uint32_t K = getColumnCount() - 1;
 	if(matrix.size() < K)
 		throw logic_error("Not enough equasions");
 
@@ -238,7 +289,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 
 
 	Matrix cofactors;
-	for(uint16_t rowNumber = 0; rowNumber < K; ++rowNumber){
+	for(uint32_t rowNumber = 0; rowNumber < K; ++rowNumber){
 		vector<ZNumber> cofactorRow(K);
 		for(uint16_t colNumber = 0; colNumber < K; ++colNumber){
 			int sign = 1;
@@ -277,9 +328,9 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 	factors.back() = 0;
 
 	int sign = 1;
-	for(uint16_t i = 0; i < K; ++i){
+	for(uint32_t i = 0; i < K; ++i){
 		factors.at(i) = sign * mCopy.getSubMatrix(0, i).calcDeterminant();
-		factors.back() -= mCopy.getNumber(0, i) * factors.at(i);//??sign *
+		factors.back() -= mCopy.getValue(0, i) * factors.at(i);//??sign *
 		sign = -sign;
 	}
 	return factors;
@@ -290,9 +341,9 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 
 Matrix Matrix::operator*(const Matrix &m) const{
 	Matrix result;
-	for(uint16_t rowNumber = 0; rowNumber < this->getRowCount(); ++rowNumber){
+	for(uint32_t rowNumber = 0; rowNumber < this->getRowCount(); ++rowNumber){
 		vector<ZNumber> row(m.getColumnCount());
-		for(uint16_t colNumber = 0; colNumber < m.getColumnCount(); ++colNumber)
+		for(uint32_t colNumber = 0; colNumber < m.getColumnCount(); ++colNumber)
 			row.at(colNumber) = sum(this->getRow(rowNumber) * m.getCol(colNumber));
 		result.insertRow(row);
 	}
@@ -334,12 +385,12 @@ Matrix Matrix::operator/=(const ZNumber &val){
 
 const Matrix &Matrix::operator=(const Matrix &matrix){
 	this->matrix = matrix.matrix;
-	return matrix;
+	return *this;
 }
 
-const vector<vector<ZNumber>> &Matrix::operator=(const vector<vector<ZNumber>> &matrix){
+Matrix &Matrix::operator=(const vector<vector<ZNumber>> &matrix){
 	this->matrix = matrix;
-	return matrix;
+	return *this;
 }
 
 

@@ -3,29 +3,36 @@
 
 class Matrix{
 	vector<vector<ZNumber>> matrix;
+
+	ZNumber calcDeterminant_Laplace() const;//N!
+	ZNumber calcDeterminant_Gauss() const;//probably, faster than Laplace
+
 public:
 	Matrix();
-	Matrix(uint16_t rowNumber, uint16_t colNumber);
+	Matrix(uint32_t rowNumber, uint32_t colNumber);
 	Matrix(const vector<vector<ZNumber>> &matrix);
 	Matrix(const initializer_list<vector<ZNumber>> &initList);
 
 
-	void resize(uint16_t rowNumber, uint16_t colNumber);
+	void resize(uint32_t rowNumber, uint32_t colNumber);
 	void randomize();
 
 	void insertRow(const vector<ZNumber> &row);
-	vector<ZNumber> getCol(uint16_t colNumber) const;
-	vector<ZNumber> getRow(uint16_t rowNumber) const;
-	void replaceCol(uint16_t colNumber, const vector<ZNumber> &col);
-	void replaceRow(uint16_t rowNumber, const vector<ZNumber> &row);
-	ZNumber getNumber(uint16_t row, uint16_t col) const;
-	uint16_t getRowCount() const;
-	uint16_t getColumnCount() const;
+	vector<ZNumber> getCol(uint32_t colNumber) const;
+	vector<ZNumber> &getRow(uint32_t rowNumber);
+	const vector<ZNumber> &getRow(uint32_t rowNumber) const;
+	void replaceCol(uint32_t colNumber, const vector<ZNumber> &col);
+	void replaceRow(uint32_t rowNumber, const vector<ZNumber> &row);
+	ZNumber &getValue(uint32_t row, uint32_t col);
+	uint32_t getRowCount() const;
+	uint32_t getColumnCount() const;
 	bool isSquare() const;
 	void transpose();
 
-	Matrix getSubMatrix(uint16_t rowNumber, uint16_t colNumber) const;
+	Matrix getRowEchelonForm() const;//приведение к ступенчатому виду
+	Matrix getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const;
 	ZNumber calcDeterminant() const;
+	vector<ZNumber> solveLinearEquasionSystem_Gauss() const;
 	vector<ZNumber> solveLinearEquasionSystem_Kramer() const;
 	vector<ZNumber> solveLinearEquasionSystem_MatrixMethod() const;
 
@@ -46,7 +53,7 @@ public:
 
 
 	const Matrix &operator=(const Matrix &matrix);
-	const vector<vector<ZNumber>> &operator=(const vector<vector<ZNumber>> &matrix);
+	Matrix &operator=(const vector<vector<ZNumber>> &matrix);
 
 	friend ostream &operator<<(ostream &o, const Matrix &matrix);
 };
