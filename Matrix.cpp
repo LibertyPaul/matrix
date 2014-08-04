@@ -13,14 +13,20 @@ using namespace std;
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
 
-Matrix::Matrix(){
+Matrix::Matrix(): matrix(){
 }
 
-Matrix::Matrix(uint32_t rowNumber, uint32_t colNumber){
+Matrix::Matrix(const Matrix &matrix): matrix(matrix.matrix){
+}
+
+Matrix::Matrix(Matrix &&matrix): matrix(move(matrix.matrix)){
+}
+
+Matrix::Matrix(uint32_t rowNumber, uint32_t colNumber): matrix(){
 	resize(rowNumber, colNumber);
 }
 
-Matrix::Matrix(const vector<vector<ZNumber>> &matrix){
+Matrix::Matrix(const vector<vector<ZNumber>> &matrix): matrix(){
 	for(auto i = matrix.begin(); i != matrix.end() - 1; ++i)
 		if(i->size() != (i + 1)->size())
 			throw logic_error("Row size does not match");
@@ -177,15 +183,28 @@ ZNumber Matrix::calcDeterminant() const{
 	return calcDeterminant_Gauss();
 }
 
-Matrix Matrix::getRowEchelonForm() const{
-	Matrix res(*this);
-	uint32_t K = res.getRowCount();
-	for(uint32_t col = 0; col < K - 1; ++col){
-		vector<ZNumber> subtrahend = res.getRow(col);
-		for(uint32_t row = col + 1; row < K; ++row)
-			res.matrix.at(row) -= subtrahend * res.matrix.at(row).at(col) / subtrahend.at(col);
+void Matrix::toRowEchelonForm(){
+	uint32_t K = getRowCount();
+
+	//make sure that all number on main diagonal not zero
+	for(uint32_t i = 0; i < K; ++i){
+		if(getValue(i, i) == 0){//finding row with non zero value in column #i
+			for(uint32_t row = 0; row < K; ++row)
+				if(getValue(row, i) != 0){
+					getRow(i) += getRow(row);//add one row to another
+					break;
+				}
+			//if(getValue(i, i) == 0)//still == 0 => all numbers in column is zeroes
+		}
 	}
-	return res;
+
+	for(uint32_t col = 0; col < K - 1; ++col){
+		vector<ZNumber> subtrahend = getRow(col);
+		if(subtrahend.at(col) == 0)
+				continue;//all numbers in column == 0, nothing to change
+		for(uint32_t row = col + 1; row < K; ++row)
+			matrix.at(row) -= subtrahend * getValue(row, col) / subtrahend.at(col);
+	}
 }
 
 
@@ -209,7 +228,12 @@ ZNumber Matrix::calcDeterminant_Laplace() const{
 
 
 ZNumber Matrix::calcDeterminant_Gauss() const{
-	Matrix mCopy = this->getRowEchelonForm();
+	if(isSquare() == false)
+		throw logic_error("Matrix is not square");
+
+	Matrix mCopy(*this);
+	mCopy.toRowEchelonForm();
+
 	ZNumber result = 1;
 	uint32_t K = mCopy.getRowCount();
 	for(uint32_t i = 0; i < K; ++i)
@@ -220,19 +244,39 @@ ZNumber Matrix::calcDeterminant_Gauss() const{
 
 
 vector<ZNumber> Matrix::solveLinearEquasionSystem_Gauss() const{
-	Matrix mCopy = this->getRowEchelonForm();
-	cout << mCopy << endl;
-	uint32_t K = mCopy.getRowCount();
+	if(matrix.empty())
+		throw runtime_error("Matrix is empty: \n" + this->toString());
+
+	uint32_t K = this->getRowCount();
+	if(this->getColumnCount() != K + 1)//not extended matrix
+		throw runtime_error("Matrix is not extended: \n" + this->toString());
+
+
+
+	Matrix t(*this);
+	t.resize(K, K);
+	if(t.calcDeterminant() == 0)
+		throw logic_error("Equasion system has no solution(determinant == 0): \n" + t.toString());
+
+
+
+
+	Matrix mCopy(*this);
+	mCopy.toRowEchelonForm();
+
 	for(uint32_t col = K - 1; col >= 1; --col){
 		vector<ZNumber> subtrahend = mCopy.getRow(col);
+		if(subtrahend.at(col) == 0)
+			continue;
 		for(int64_t row = col - 1; row >= 0; --row)
 			mCopy.getRow(row) -= subtrahend * mCopy.getValue(row, col) / subtrahend.at(col);
 	}
-	cout << mCopy << endl;
+
 
 	vector<ZNumber> res(K);
 	for(uint32_t i = 0; i < K; ++i)
-		res.at(i) = mCopy.getValue(i, i) / mCopy.getValue(i, K);
+		res.at(i) = -(mCopy.getValue(i, K) / mCopy.getValue(i, i));
+
 
 	return res;
 }
@@ -313,16 +357,21 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
 	return result.getCol(0);
 }
 
-
+/*
 vector<ZNumber> Matrix::getFlatPolynomial() const{
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square.");
 
 	size_t K = getRowCount();
 	Matrix mCopy(*this);
-	for(size_t col = 0; col < K; ++col)
+	cout << mCopy << endl;
+	for(size_t col = 0; col < K; ++col){
+		ZNumber subtrahend = mCopy.matrix.at(0).at(col);
 		for(size_t row = 1; row < K; ++row)
-			mCopy.matrix.at(row).at(col) -= mCopy.matrix.at(0).at(col);
+			mCopy.matrix.at(row).at(col) -= subtrahend;
+	}
+
+	cout << mCopy << endl;
 
 	vector<ZNumber> factors(K + 1);
 	factors.back() = 0;
@@ -333,8 +382,32 @@ vector<ZNumber> Matrix::getFlatPolynomial() const{
 		factors.back() -= mCopy.getValue(0, i) * factors.at(i);//??sign *
 		sign = -sign;
 	}
+	cout << factors << endl;
 	return factors;
 }
+*/
+
+vector<ZNumber> Matrix::getFlatPolynomial() const{
+	if(isSquare() == false)
+		throw logic_error("Matrix is not square.");
+
+	size_t K = getRowCount();
+	Matrix mCopy(*this);
+
+	vector<ZNumber> polynomial(K + 1);
+	for(size_t i = 0; i < K; ++i){
+		Matrix mCopy(*this);
+		vector<ZNumber> replacement(K, 1);//1 1 1 1 1 1 1 1... k times
+		mCopy.replaceCol(i, replacement);
+		polynomial.at(i) = mCopy.calcDeterminant();
+	}
+
+	polynomial.back() = -this->calcDeterminant();
+
+	return polynomial;
+}
+
+
 
 
 
@@ -417,6 +490,20 @@ Matrix Matrix::operator+=(const ZNumber &val){
 Matrix Matrix::operator-=(const ZNumber &val){
 	*this += -val;
 	return *this;
+}
+
+
+
+string Matrix::toString() const{
+	string result;
+	for(const auto &row : matrix){
+		for(const auto &zn : row){
+			result += zn.toString();
+			result += ' ';
+		}
+		result += '\n';
+	}
+	return result;
 }
 
 

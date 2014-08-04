@@ -5,13 +5,16 @@ class Matrix{
 	vector<vector<ZNumber>> matrix;
 
 	ZNumber calcDeterminant_Laplace() const;//N!
-	ZNumber calcDeterminant_Gauss() const;//probably, faster than Laplace
+	ZNumber calcDeterminant_Gauss() const;//MUCH MORE faster than Laplace
 
 public:
 	Matrix();
+	Matrix(const Matrix &matrix);
+	Matrix(Matrix &&matrix);
 	Matrix(uint32_t rowNumber, uint32_t colNumber);
 	Matrix(const vector<vector<ZNumber>> &matrix);
 	Matrix(const initializer_list<vector<ZNumber>> &initList);
+
 
 
 	void resize(uint32_t rowNumber, uint32_t colNumber);
@@ -29,7 +32,7 @@ public:
 	bool isSquare() const;
 	void transpose();
 
-	Matrix getRowEchelonForm() const;//приведение к ступенчатому виду
+	void toRowEchelonForm();//приведение к ступенчатому виду
 	Matrix getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const;
 	ZNumber calcDeterminant() const;
 	vector<ZNumber> solveLinearEquasionSystem_Gauss() const;
@@ -55,6 +58,9 @@ public:
 	const Matrix &operator=(const Matrix &matrix);
 	Matrix &operator=(const vector<vector<ZNumber>> &matrix);
 
+
+
+	string toString() const;
 	friend ostream &operator<<(ostream &o, const Matrix &matrix);
 };
 

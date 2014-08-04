@@ -22,9 +22,9 @@ public:
 	const ZNumber &operator%=(const ZNumber &zn);
 
 
-	ZNumber operator++();
+	const ZNumber &operator++();
 	ZNumber operator++(int);
-	ZNumber operator--();
+	const ZNumber &operator--();
 	ZNumber operator--(int);
 
 
@@ -48,6 +48,8 @@ public:
 	friend int64_t operator/(const int64_t &n, const ZNumber &zn);
 	friend int64_t operator%(const int64_t &n, const ZNumber &zn);
 
+
+	string toString() const;
 	friend ostream &operator<<(ostream &o, const ZNumber &zn);
 	friend istream &operator>>(istream &i, const ZNumber &zn);
 };
@@ -66,6 +68,8 @@ istream &operator>>(istream &i, const ZNumber &zn);
 
 
 ostream &operator<<(ostream &o, const vector<ZNumber> &v);
+vector<ZNumber> operator+(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
+vector<ZNumber> operator+=(vector<ZNumber> &v1, const vector<ZNumber> &v2);
 vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
 vector<ZNumber> operator*(vector<ZNumber> v, const ZNumber &zn);
 vector<ZNumber> operator/(vector<ZNumber> v, const ZNumber &zn);

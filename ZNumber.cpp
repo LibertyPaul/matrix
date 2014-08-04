@@ -2,6 +2,7 @@
 #include <ostream>
 #include <vector>
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 #include "ZNumber.hpp"
@@ -36,6 +37,8 @@ ZNumber ZNumber::operator*(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator/(const ZNumber &zn) const{
+	if(zn == 0)
+		throw logic_error("Division by 0");
 	int32_t d, x, y;
 	GCD_ext(zn.n, module, d, x, y);//хз как, но оно работает
 	return *this * x;
@@ -77,7 +80,7 @@ const ZNumber &ZNumber::operator%=(const ZNumber &zn){
 }
 
 
-ZNumber ZNumber::operator++(){
+const ZNumber &ZNumber::operator++(){
 	return ZNumber(this->n++);
 }
 
@@ -85,7 +88,7 @@ ZNumber ZNumber::operator++(int){
 	return ZNumber(++this->n);
 }
 
-ZNumber ZNumber::operator--(){
+const ZNumber &ZNumber::operator--(){
 	return ZNumber(this->n--);
 }
 
@@ -138,6 +141,11 @@ ZNumber ZNumber::operator-() const{
 	return ZNumber(module - (n % module));
 }
 
+string ZNumber::toString() const{
+	string res;
+	res = to_string(n);
+	return res;
+}
 
 
 int64_t operator+(const int64_t &n, const ZNumber &zn){
@@ -174,13 +182,26 @@ istream &operator>>(istream &i, const ZNumber &zn){
 
 
 
-
 ostream &operator<<(ostream &o, const vector<ZNumber> &v){
 	for(auto &n : v)
 		o << n << " ";
 	return o;
 }
 
+vector<ZNumber> operator+(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
+	if(v1.size() != v2.size())
+		throw logic_error("Vector size does not match");
+
+	vector<ZNumber> res(v1.size());
+	for(uint16_t i = 0; i < res.size(); ++i)
+		res.at(i) = v1.at(i) + v2.at(i);
+	return res;
+}
+
+vector<ZNumber> operator+=(vector<ZNumber> &v1, const vector<ZNumber> &v2){
+	v1 = v1 + v2;
+	return v1;
+}
 
 vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
 	if(v1.size() != v2.size())
