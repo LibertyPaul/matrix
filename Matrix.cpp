@@ -174,14 +174,6 @@ Matrix Matrix::getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const{
 	return newMatrix;
 }
 
-ZNumber Matrix::calcDeterminant() const{
-	if(matrix.empty())
-		throw runtime_error("Matrix is empty");
-	if(isSquare() == false)
-		throw logic_error("Matrix is not square");
-
-	return calcDeterminant_Gauss();
-}
 
 void Matrix::toRowEchelonForm(){
 	uint32_t K = getRowCount();
@@ -208,26 +200,8 @@ void Matrix::toRowEchelonForm(){
 }
 
 
-ZNumber Matrix::calcDeterminant_Laplace() const{
-	switch(getRowCount()){
-		case 1: return matrix.at(0).at(0);
-		case 2: return matrix.at(0).at(0) * matrix.at(1).at(1) - matrix.at(0).at(1) * matrix.at(1).at(0);
 
-		default: {
-			ZNumber res(0);
-			int sign = 1;
-			uint16_t colCount = getColumnCount();
-			for(uint16_t col = 0; col < colCount; ++col){
-				res += sign * matrix.front().at(col) * getSubMatrix(0, col).calcDeterminant();//heavy call
-				sign = -sign;
-			}
-			return res;
-		}
-	}
-}
-
-
-ZNumber Matrix::calcDeterminant_Gauss() const{
+ZNumber Matrix::calcDeterminant() const{
 	if(isSquare() == false)
 		throw logic_error("Matrix is not square");
 
@@ -243,7 +217,7 @@ ZNumber Matrix::calcDeterminant_Gauss() const{
 }
 
 
-vector<ZNumber> Matrix::solveLinearEquasionSystem_Gauss() const{
+vector<ZNumber> Matrix::solveLinearEquasionSystem() const{
 	if(matrix.empty())
 		throw runtime_error("Matrix is empty: \n" + this->toString());
 
@@ -282,110 +256,7 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem_Gauss() const{
 }
 
 
-vector<ZNumber> Matrix::solveLinearEquasionSystem_Kramer() const{
-	if(matrix.empty())
-		throw runtime_error("Matrix is empty");
-	if(matrix.size() < getColumnCount() - 1)
-		throw logic_error("Not enough equasions");
 
-	vector<ZNumber> coords(getColumnCount() - 1);
-
-	Matrix mCopy(*this);
-	mCopy.resize(this->getColumnCount() - 1, this->getColumnCount() - 1);//отбрасываем лишние уравнения
-
-	ZNumber dividerDet = mCopy.calcDeterminant();
-	if(dividerDet == 0)
-		throw logic_error("divider == 0");
-
-
-
-	vector<ZNumber> lastCol = this->getCol(this->getColumnCount() - 1);
-	lastCol.resize(mCopy.getRowCount());
-	for(auto &lastN : lastCol)
-		lastN = -lastN;
-
-	for(uint32_t i = 0; i < mCopy.getColumnCount(); ++i){
-		vector<ZNumber> temp = mCopy.getCol(i);
-		mCopy.replaceCol(i, lastCol);
-		coords.at(i) = mCopy.calcDeterminant() / dividerDet;
-		mCopy.replaceCol(i, temp);
-	}
-	return coords;
-}
-
-
-vector<ZNumber> Matrix::solveLinearEquasionSystem_MatrixMethod() const{
-	if(matrix.empty())
-		throw runtime_error("Matrix is empty");
-
-	uint32_t K = getColumnCount() - 1;
-	if(matrix.size() < K)
-		throw logic_error("Not enough equasions");
-
-	vector<ZNumber> coords(K);
-	vector<ZNumber> lastCol = this->getCol(K);
-
-	Matrix mCopy(*this);
-	mCopy.resize(K, K);
-	ZNumber mainDeterminant = mCopy.calcDeterminant();
-	if(mainDeterminant == 0)
-		throw logic_error("Determinant == 0");
-
-
-	Matrix cofactors;
-	for(uint32_t rowNumber = 0; rowNumber < K; ++rowNumber){
-		vector<ZNumber> cofactorRow(K);
-		for(uint16_t colNumber = 0; colNumber < K; ++colNumber){
-			int sign = 1;
-			if((rowNumber + colNumber) % 2 != 0)
-				sign = -1;
-			cofactorRow.at(colNumber) = mCopy.getSubMatrix(rowNumber, colNumber).calcDeterminant() * sign;
-		}
-		cofactors.insertRow(cofactorRow);
-	}
-
-	cofactors.transpose();
-
-	Matrix lastColMatrix;
-	lastColMatrix.insertRow(lastCol);
-	lastColMatrix.transpose();
-
-	Matrix result = (cofactors * lastColMatrix) / mainDeterminant;
-
-	result *= -1;
-
-	return result.getCol(0);
-}
-
-/*
-vector<ZNumber> Matrix::getFlatPolynomial() const{
-	if(isSquare() == false)
-		throw logic_error("Matrix is not square.");
-
-	size_t K = getRowCount();
-	Matrix mCopy(*this);
-	cout << mCopy << endl;
-	for(size_t col = 0; col < K; ++col){
-		ZNumber subtrahend = mCopy.matrix.at(0).at(col);
-		for(size_t row = 1; row < K; ++row)
-			mCopy.matrix.at(row).at(col) -= subtrahend;
-	}
-
-	cout << mCopy << endl;
-
-	vector<ZNumber> factors(K + 1);
-	factors.back() = 0;
-
-	int sign = 1;
-	for(uint32_t i = 0; i < K; ++i){
-		factors.at(i) = sign * mCopy.getSubMatrix(0, i).calcDeterminant();
-		factors.back() -= mCopy.getValue(0, i) * factors.at(i);//??sign *
-		sign = -sign;
-	}
-	cout << factors << endl;
-	return factors;
-}
-*/
 
 vector<ZNumber> Matrix::getFlatPolynomial() const{
 	if(isSquare() == false)

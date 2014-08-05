@@ -50,7 +50,7 @@ bool fullIteration(){
 		res.insertRow(m.getFlatPolynomial());
 
 
-	vector<ZNumber> coords = res.solveLinearEquasionSystem_Gauss();
+	vector<ZNumber> coords = res.solveLinearEquasionSystem();
 	cout << "Secret: " << endl << secret << endl << "Result:" << endl << coords << endl << endl;
 	return coords == secret;
 }

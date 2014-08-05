@@ -4,9 +4,6 @@
 class Matrix{
 	vector<vector<ZNumber>> matrix;
 
-	ZNumber calcDeterminant_Laplace() const;//N!
-	ZNumber calcDeterminant_Gauss() const;//MUCH MORE faster than Laplace
-
 public:
 	Matrix();
 	Matrix(const Matrix &matrix);
@@ -34,10 +31,8 @@ public:
 
 	void toRowEchelonForm();//приведение к ступенчатому виду
 	Matrix getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const;
-	ZNumber calcDeterminant() const;
-	vector<ZNumber> solveLinearEquasionSystem_Gauss() const;
-	vector<ZNumber> solveLinearEquasionSystem_Kramer() const;
-	vector<ZNumber> solveLinearEquasionSystem_MatrixMethod() const;
+	ZNumber calcDeterminant() const;//метод Гаусса
+	vector<ZNumber> solveLinearEquasionSystem() const;//метод Гаусса
 
 	vector<ZNumber> getFlatPolynomial() const;//уравнение плоскости
 
