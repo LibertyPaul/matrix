@@ -141,6 +141,11 @@ ZNumber ZNumber::operator-() const{
 	return ZNumber(module - (n % module));
 }
 
+
+uint32_t ZNumber::getValue() const{
+	return n;
+}
+
 string ZNumber::toString() const{
 	string res;
 	res = to_string(n);

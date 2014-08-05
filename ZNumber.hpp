@@ -43,7 +43,7 @@ public:
 	ZNumber operator-() const;
 
 
-
+	uint32_t getValue() const;
 	string toString() const;
 	friend ostream &operator<<(ostream &o, const ZNumber &zn);
 	friend istream &operator>>(istream &i, const ZNumber &zn);
