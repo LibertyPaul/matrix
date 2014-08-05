@@ -27,13 +27,11 @@ bool DataSplitter::checkSecret(const vector<ZNumber> &secret) const{
 
 Matrix DataSplitter::split(const vector<uint32_t> &data) const{
 	vector<ZNumber> secret;
-	for(const auto &n : data)
+	for(const auto &n : data){
+		if(n & (0x00000001U << 31))
+			throw logic_error("Data containers must not contain more than 31 meaning bit. It will cause data loss.");
 		secret.push_back(n);
-
-	do{
-		for(auto &coord : secret)
-			coord = randomGenerator();
-	}while(checkSecret(secret) == false);
+	}
 
 	vector<Matrix> matrix(N);
 	for(size_t i = 0; i < N; ++i){
