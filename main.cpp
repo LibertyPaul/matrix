@@ -8,6 +8,7 @@
 #include <random>
 #include <initializer_list>
 
+
 using namespace std;
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
@@ -23,9 +24,9 @@ bool checkSecret(const vector<ZNumber> &secret){
 
 
 bool fullIteration(){
-	unsigned seed1 = std::chrono::system_clock::now().time_since_epoch().count();
+	unsigned seed1 = chrono::system_clock::now().time_since_epoch().count();
 	mt19937 g1(seed1);
-	const uint16_t K = 3;
+	const uint16_t K = 10;
 
 
 	vector<ZNumber> secret(K);
@@ -33,6 +34,8 @@ bool fullIteration(){
 		for(auto &coord : secret)
 			coord = g1();
 	}while(checkSecret(secret) == false);
+
+
 
 
 	vector<Matrix> matrix(K);
@@ -51,17 +54,24 @@ bool fullIteration(){
 
 
 	vector<ZNumber> coords = res.solveLinearEquasionSystem();
-	cout << "Secret: " << endl << secret << endl << "Result:" << endl << coords << endl << endl;
-	return coords == secret;
+	if(coords != secret){
+		cout << "\n\n\n\nSecret: " << endl << secret << endl << "Result:" << endl << coords << endl << endl;
+		for(const auto &m : matrix)
+			cout << m << endl << endl;
+		return false;
+	}
+	else
+		return true;
 }
 
 
 int main(){
-	uint16_t i = 1;
-	while(true){
-		cout << i++ << ":" << endl;
-		fullIteration();
+	uint32_t success = 0;
+	for(size_t i = 0; i < 100; ++i){
+		if(fullIteration())
+			++success;
 	}
+	cout << success << endl;
 
 
 }

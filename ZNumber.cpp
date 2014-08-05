@@ -18,7 +18,7 @@ ZNumber::ZNumber(int64_t n){
 }
 
 ZNumber ZNumber::operator+(const ZNumber &zn) const{
-	uint64_t res = this->n + zn.n;
+	uint64_t res = static_cast<uint64_t>(this->n) + zn.n;
 	if(res >= module)
 		res %= module;
 	return res;
@@ -29,7 +29,7 @@ ZNumber ZNumber::operator-(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator*(const ZNumber &zn) const{
-	uint64_t res = this->n * zn.n;
+	uint64_t res = static_cast<uint64_t>(this->n) * zn.n;
 	if(res >= module)
 		res %= module;
 
@@ -39,7 +39,7 @@ ZNumber ZNumber::operator*(const ZNumber &zn) const{
 ZNumber ZNumber::operator/(const ZNumber &zn) const{
 	if(zn == 0)
 		throw logic_error("Division by 0");
-	int32_t d, x, y;
+	int64_t d, x, y;
 	GCD_ext(zn.n, module, d, x, y);//хз как, но оно работает
 	return *this * x;
 }
@@ -148,26 +148,6 @@ string ZNumber::toString() const{
 }
 
 
-int64_t operator+(const int64_t &n, const ZNumber &zn){
-	return n + zn.n;
-}
-
-int64_t operator-(const int64_t &n, const ZNumber &zn){
-	return n - zn.n;
-}
-
-int64_t operator*(const int64_t &n, const ZNumber &zn){
-	return n * zn.n;
-}
-
-int64_t operator/(const int64_t &n, const ZNumber &zn){
-	return n / zn.n;
-}
-
-int64_t operator%(const int64_t &n, const ZNumber &zn){
-	return n % zn.n;
-}
-
 ostream &operator<<(ostream &o, const ZNumber &zn){
 	o << zn.n;
 	return o;
@@ -246,7 +226,7 @@ ZNumber sum(const vector<ZNumber> &v){
 
 
 
-void GCD_ext(int32_t a, int32_t b, int32_t &d, int32_t &x, int32_t &y){
+void GCD_ext(int64_t a, int64_t b, int64_t &d, int64_t &x, int64_t &y){
 	if(b == 0){
 		d = a;
 		x = 1;
@@ -254,7 +234,7 @@ void GCD_ext(int32_t a, int32_t b, int32_t &d, int32_t &x, int32_t &y){
 		return;
 	}
 	GCD_ext(b, a % b, d, x, y);
-	uint32_t t = y;
+	int64_t t = y;
 	y = x - (a / b) * y;
 	x = t;
 }
