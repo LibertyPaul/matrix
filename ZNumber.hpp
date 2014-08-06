@@ -3,7 +3,7 @@
 
 
 class ZNumber{
-	static const uint32_t module = 4294967291;
+	static const uint32_t module = 4294967291;//should be prime < 2^32
 	uint32_t n;
 public:
 	ZNumber(int64_t n = 0);

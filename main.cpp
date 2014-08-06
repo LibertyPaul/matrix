@@ -4,7 +4,6 @@
 #include <ostream>
 #include <algorithm>
 
-#include <chrono>
 #include <random>
 #include <initializer_list>
 
@@ -20,7 +19,8 @@ using namespace std;
 
 int main(){
 	DataSplitter dataSplitter(10, 20);
-	vector<uint32_t> data = {42, 42, 42, 42, 42, 42, 42, 42, 42, 42};
+	vector<uint32_t> data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//vector<uint32_t> data = {42, 42, 42, 42, 42, 42, 42, 42, 42, 42};
 	Matrix splittedData = dataSplitter.split(data);
 	splittedData.resize(10, 11);
 

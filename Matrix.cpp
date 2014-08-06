@@ -219,11 +219,14 @@ ZNumber Matrix::calcDeterminant() const{
 
 vector<ZNumber> Matrix::solveLinearEquasionSystem() const{
 	if(matrix.empty())
-		throw runtime_error("Matrix is empty: \n" + this->toString());
+		throw runtime_error("Matrix is empty");
 
 	uint32_t K = this->getRowCount();
-	if(this->getColumnCount() != K + 1)//not extended matrix
-		throw runtime_error("Matrix is not extended: \n" + this->toString());
+
+	if(this->getColumnCount() > K + 1)
+		throw logic_error("Equasion system is redundant: \n" + this->toString());
+	if(this->getColumnCount() < K + 1)
+		throw logic_error("Equasion system is insufficient: \n" + this->toString());
 
 
 
