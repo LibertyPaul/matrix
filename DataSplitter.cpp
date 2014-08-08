@@ -8,6 +8,7 @@
 #include <ostream>
 #include <iostream>
 
+#include "stuff.h"
 using namespace std;
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
@@ -18,22 +19,12 @@ DataSplitter::DataSplitter(uint32_t K, uint32_t N): K(K), N(N), randomGenerator(
 		throw logic_error("N must be larger or equal to K");
 }
 
-string dec2bin(uint32_t n){
-	string res;
-	for(size_t i = 0; i < 32; ++i)
-		if(n & (1 << (31 - i)))
-			res += "1";
-		else
-			res += "0";
-	return res;
-}
+
 
 void DataSplitter::randomizeHigherBitsOfSecret(vector<ZNumber> &secret) const{
 	for(auto &zn : secret){
 		uint32_t value = zn.getValue();
-		cout << dec2bin(value) << " -> ";
 		value ^= (randomGenerator() % 2) << bitCapacity;
-		cout << dec2bin(value) << endl;
 		zn = value;
 	}
 }

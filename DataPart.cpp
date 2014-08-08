@@ -21,3 +21,12 @@ vector<vector<ZNumber>> &DataPart::get(){
 const vector<vector<ZNumber>> &DataPart::get() const{
 	return linearEquasions;
 }
+
+
+void DataPart::push_back(const vector<ZNumber> &equasion){
+	linearEquasions.push_back(equasion);
+}
+
+void DataPart::push_back(vector<ZNumber> &&equasion){
+	linearEquasions.push_back(equasion);
+}

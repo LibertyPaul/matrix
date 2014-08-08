@@ -3,35 +3,55 @@
 #include <istream>
 #include <ostream>
 #include <algorithm>
+#include <memory>
 
 #include <random>
+#include <chrono>
 #include <initializer_list>
 
 
+#include "stuff.h"
 using namespace std;
 #include "ZNumber.hpp"
 #include "Matrix.hpp"
 #include "DataSplitter.hpp"
+#include "Buffer.hpp"
+#include "DataSeparator.hpp"
 
 
+const uint16_t K = 10, N = 15;
+const uint64_t secretLength = 1024;
+
+bool iter(){
+	DataSeparator dataSeparator(K, N);
+
+	size_t seed = chrono::system_clock::now().time_since_epoch().count();
+	mt19937 randomGenerator(seed);
+
+
+	vector<uint8_t> rawData(secretLength);
+	for(auto &n : rawData){
+		n = randomGenerator();
+	}
+
+	Buffer src(rawData);
+
+	vector<vector<uint32_t>> dst = dataSeparator.separate(src);
+
+	Buffer result = dataSeparator.restore(dst);
+
+	return result == src;
+}
 
 
 
 int main(){
-	DataSplitter dataSplitter(10, 20);
-	vector<uint32_t> data = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//vector<uint32_t> data = {42, 42, 42, 42, 42, 42, 42, 42, 42, 42};
-	Matrix splittedData = dataSplitter.split(data);
-	splittedData.resize(10, 11);
+	size_t successes = 0;
 
-	vector<uint32_t> result = dataSplitter.restore(splittedData);
+	for(size_t i = 0; i < 10; ++i)
+		if(iter())
+			++successes;
 
-	if(data == result)
-		cout << "Success!" << endl;
-	else{
-		cout << "Fault((" << endl;
-		for(const auto &n : result)
-			cout << n << ' ';
-		cout << endl;
-	}
+	cout << successes << endl;
+
 }
