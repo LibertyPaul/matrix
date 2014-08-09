@@ -183,6 +183,17 @@ vector<ZNumber> operator+(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
 	return res;
 }
 
+vector<ZNumber> operator-(const vector<ZNumber> &v2){
+	vector<ZNumber> result(v2.size());
+	for(size_t i = 0; i < v2.size(); ++i)
+		result.at(i) = -v2.at(i);
+	return result;
+}
+
+vector<ZNumber> operator-(const vector<ZNumber> &v1, const vector<ZNumber> &v2){
+	return v1 + (-v2);
+}
+
 vector<ZNumber> operator+=(vector<ZNumber> &v1, const vector<ZNumber> &v2){
 	v1 = v1 + v2;
 	return v1;
@@ -212,12 +223,7 @@ vector<ZNumber> operator/(vector<ZNumber> v, const ZNumber &zn){
 
 
 vector<ZNumber> operator-=(vector<ZNumber> &zv1, const vector<ZNumber> &zv2){
-	if(zv1.size() != zv2.size())
-		throw logic_error("Vector size does not match");
-	uint32_t K = zv1.size();
-	for(uint32_t i = 0; i < K; ++i)
-		zv1.at(i) -= zv2.at(i);
-
+	zv1 = zv1 - zv2;
 	return zv1;
 }
 

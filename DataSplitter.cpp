@@ -60,7 +60,7 @@ Matrix DataSplitter::split(const vector<uint32_t> &data) const{
 	Matrix linearEquasion;//если N > K, то уравнение избыточно.
 
 	for(size_t i = 0; i < N; ++i)
-		linearEquasion.insertRow(matrices.at(i).getFlatPolynomial());
+		linearEquasion.pushRowBack(matrices.at(i).getFlatPolynomial());
 	return linearEquasion;
 }
 

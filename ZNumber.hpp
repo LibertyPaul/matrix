@@ -57,10 +57,13 @@ istream &operator>>(istream &i, const ZNumber &zn);
 ostream &operator<<(ostream &o, const vector<ZNumber> &v);
 vector<ZNumber> operator+(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
 vector<ZNumber> operator+=(vector<ZNumber> &v1, const vector<ZNumber> &v2);
+vector<ZNumber> operator-(const vector<ZNumber> &v2);
+vector<ZNumber> operator-(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
+vector<ZNumber> operator-=(vector<ZNumber> &zv1, const vector<ZNumber> &zv2);
+
 vector<ZNumber> operator*(const vector<ZNumber> &v1, const vector<ZNumber> &v2);
 vector<ZNumber> operator*(vector<ZNumber> v, const ZNumber &zn);
 vector<ZNumber> operator/(vector<ZNumber> v, const ZNumber &zn);
-vector<ZNumber> operator-=(vector<ZNumber> &zv1, const vector<ZNumber> &zv2);
 ZNumber sum(const vector<ZNumber> &v);
 
 void GCD_ext(int64_t a, int64_t b, int64_t &d, int64_t &x, int64_t &y);

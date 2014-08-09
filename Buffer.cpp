@@ -12,11 +12,11 @@ using namespace std;
 Buffer::Buffer(): size(0), buffer(nullptr), readPos(0), writePos(0){}
 Buffer::Buffer(uint64_t size): size(size), buffer(new uint8_t[size]), readPos(0), writePos(0){}
 
-Buffer::Buffer(const Buffer &buffer): size(buffer.getSize()), buffer(new uint8_t[size]), readPos(0), writePos(0){
+Buffer::Buffer(const Buffer &buffer): size(buffer.getSize()), buffer(new uint8_t[size]), readPos(buffer.readPos), writePos(buffer.writePos){
 	memcpy(this->get(), buffer.get(), size);
 }
 
-Buffer::Buffer(Buffer &&buffer): size(buffer.getSize()), buffer(move(buffer.buffer)), readPos(0), writePos(0){}
+Buffer::Buffer(Buffer &&buffer): size(buffer.getSize()), buffer(move(buffer.buffer)), readPos(buffer.readPos), writePos(buffer.writePos){}
 
 void Buffer::operator=(Buffer &&buffer){
 	this->buffer = move(buffer.buffer);

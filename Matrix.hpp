@@ -4,6 +4,9 @@
 class Matrix{
 	vector<vector<ZNumber>> matrix;
 
+
+	void transposeOnPlace();//иногда, эффективнее(по памяти) транспонировать матрицу прямо на месте
+	void transposeWithCopy();//иногда, эффективнее создать копию и из нее переписывать
 public:
 	Matrix();
 	Matrix(const Matrix &matrix);
@@ -13,24 +16,30 @@ public:
 	Matrix(const initializer_list<vector<ZNumber>> &initList);
 
 
+	uint32_t getRowCount() const;
+	uint32_t getColumnCount() const;
+	bool isSquare() const;
 
 	void resize(uint32_t rowNumber, uint32_t colNumber);
 	void randomize();
 
-	void insertRow(const vector<ZNumber> &row);
+	ZNumber &get(uint32_t row, uint32_t col);
+	const ZNumber &get(uint32_t row, uint32_t col) const;
+
 	vector<ZNumber> getCol(uint32_t colNumber) const;
-	vector<ZNumber> &getRow(uint32_t rowNumber);
-	const vector<ZNumber> &getRow(uint32_t rowNumber) const;
-	void replaceCol(uint32_t colNumber, const vector<ZNumber> &col);
-	void replaceRow(uint32_t rowNumber, const vector<ZNumber> &row);
-	ZNumber &getValue(uint32_t row, uint32_t col);
-	uint32_t getRowCount() const;
-	uint32_t getColumnCount() const;
-	bool isSquare() const;
+	vector<ZNumber> getRow(uint32_t rowNumber) const;
+
+	void replaceCol(uint32_t colNumber, const vector<ZNumber> &newCol);
+	void replaceRow(uint32_t rowNumber, const vector<ZNumber> &newRow);
+
+	void insertRow(const vector<ZNumber> &newRow, uint32_t rowNumber);
+	void insertCol(const vector<ZNumber> &newCol, uint32_t colNumber);
+	void pushRowBack(const vector<ZNumber> &newRow);
+	void pushColBack(const vector<ZNumber> &newCol);
+
 	void transpose();
 
 	void toRowEchelonForm();//приведение к ступенчатому виду
-	Matrix getSubMatrix(uint32_t rowNumber, uint32_t colNumber) const;
 	ZNumber calcDeterminant() const;//метод Гаусса
 	vector<ZNumber> solveLinearEquasionSystem() const;//метод Гаусса
 
@@ -51,7 +60,8 @@ public:
 
 
 	const Matrix &operator=(const Matrix &matrix);
-	Matrix &operator=(const vector<vector<ZNumber>> &matrix);
+	const Matrix &operator=(Matrix &&matrix);
+	const Matrix &operator=(const vector<vector<ZNumber>> &matrix);
 
 
 
