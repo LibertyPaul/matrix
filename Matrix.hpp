@@ -1,6 +1,10 @@
 #ifndef MATRIX_HPP_INCLUDED
 #define MATRIX_HPP_INCLUDED
 
+#include <initializer_list>
+#include <vector>
+#include "ZNumber.hpp"
+
 class Matrix{
 	vector<vector<ZNumber>> matrix;
 
@@ -66,10 +70,8 @@ public:
 
 
 	string toString() const;
-	friend ostream &operator<<(ostream &o, const Matrix &matrix);
 };
 
-ostream &operator<<(ostream &o, const Matrix &matrix);
 
 
 

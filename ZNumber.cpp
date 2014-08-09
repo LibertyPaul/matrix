@@ -1,8 +1,4 @@
-#include <istream>
-#include <ostream>
-#include <vector>
 #include <stdexcept>
-#include <string>
 
 using namespace std;
 #include "ZNumber.hpp"

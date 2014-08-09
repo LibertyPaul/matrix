@@ -1,16 +1,10 @@
-#include <vector>
 #include <stdexcept>
-#include <istream>
-#include <ostream>
-#include <sstream>
 #include <chrono>
 #include <random>
-#include <initializer_list>
 
-#include <iostream>
+
 
 using namespace std;
-#include "ZNumber.hpp"
 #include "Matrix.hpp"
 
 Matrix::Matrix(): matrix(){
@@ -455,12 +449,6 @@ string Matrix::toString() const{
 		result += '\n';
 	}
 	return result;
-}
-
-
-ostream &operator<<(ostream &o, const Matrix &matrix){
-	o << matrix.toString();
-	return o;
 }
 
 

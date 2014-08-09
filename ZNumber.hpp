@@ -1,6 +1,9 @@
 #ifndef ZNUMBER_HPP_INCLUDED
 #define ZNUMBER_HPP_INCLUDED
 
+#include <vector>
+#include <istream>
+#include <ostream>
 
 class ZNumber{
 	static const uint32_t module = 4294967291;//should be prime < 2^32

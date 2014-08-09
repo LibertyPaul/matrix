@@ -1,6 +1,11 @@
 #ifndef BUFFER_HPP_INCLUDED
 #define BUFFER_HPP_INCLUDED
 
+#include <memory>
+#include <istream>
+#include <ostream>
+#include <vector>
+
 
 class Buffer{
 	uint64_t size;

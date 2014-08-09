@@ -1,17 +1,9 @@
-#include <vector>
 #include <chrono>
-#include <random>
-#include <initializer_list>
 #include <stdexcept>
 
-#include <istream>
-#include <ostream>
-#include <iostream>
 
 #include "stuff.h"
 using namespace std;
-#include "ZNumber.hpp"
-#include "Matrix.hpp"
 #include "DataSplitter.hpp"
 
 DataSplitter::DataSplitter(uint32_t K, uint32_t N): K(K), N(N), randomGenerator(chrono::system_clock::now().time_since_epoch().count()){

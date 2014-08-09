@@ -1,6 +1,11 @@
 #ifndef DATASPLITTER_HPP_INCLUDED
 #define DATASPLITTER_HPP_INCLUDED
 
+#include <random>
+#include <vector>
+#include "ZNumber.hpp"
+#include "Matrix.hpp"
+
 class DataSplitter{
 	uint32_t K;
 	uint32_t N;
