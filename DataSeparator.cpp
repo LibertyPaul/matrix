@@ -43,6 +43,7 @@ vector<uint32_t> DataSeparator::raw2container(const Buffer &src, size_t srcLengt
 	dcBuffer.write<DataContainer>(dc);
 
 	Buffer dst_buf(K * sizeof(uint32_t));
+	dst_buf.fill(0);
 	for(size_t i = 0; i < dcLength_bits; ++i){
 		bool bit = dcBuffer.getBit(i);
 		dst_buf.setBit<uint32_t, bitCapacity>(bit, i);

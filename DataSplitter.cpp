@@ -1,9 +1,11 @@
 #include <chrono>
 #include <stdexcept>
+#include <thread>
 
 
 #include "stuff.h"
 using namespace std;
+#include "ZNumber.hpp"
 #include "DataSplitter.hpp"
 
 DataSplitter::DataSplitter(uint32_t K, uint32_t N): K(K), N(N), randomGenerator(chrono::system_clock::now().time_since_epoch().count()){
@@ -35,19 +37,25 @@ Matrix DataSplitter::split(const vector<uint32_t> &data) const{
 
 
 	vector<Matrix> matrices(N);
+	vector<thread> threads;//потоков может быть слишком много. надо бы как нибудь ограничить их число 8 или 16
 	for(auto &matrix : matrices){
-		matrix.resize(K, K);
-		matrix.randomize();
-
-		size_t secretRowNumber = randomGenerator() % matrix.getRowCount();//выбираем случайную строку для вставки секрета
-		matrix.replaceRow(secretRowNumber, secret);
-
-		while(matrix.calcDeterminant() == 0){
+		//threads.emplace_back([&](){
+			matrix.resize(K, K);
 			matrix.randomize();
-			randomizeHigherBitsOfSecret(secret);
+
+			size_t secretRowNumber = randomGenerator() % matrix.getRowCount();//выбираем случайную строку для вставки секрета
 			matrix.replaceRow(secretRowNumber, secret);
-		}
+
+			while(matrix.calcDeterminant() == 0){
+				matrix.randomize();
+				randomizeHigherBitsOfSecret(secret);
+				matrix.replaceRow(secretRowNumber, secret);
+			}
+		//});
 	}
+//	for(auto &t : threads)
+	//	t.join();
+
 
 	Matrix linearEquasion;//если N > K, то уравнение избыточно.
 

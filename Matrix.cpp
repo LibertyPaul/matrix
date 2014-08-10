@@ -104,7 +104,7 @@ void Matrix::replaceRow(uint32_t rowNumber, const vector<ZNumber> &row){
 	if(rowNumber >= rowCount)
 		throw logic_error("rowNumber is greater than max row index");
 
-	if(colCount != row.size())
+	if(matrix.empty() == false && colCount != row.size())
 		throw logic_error("Row size doesn't match");
 
 	for(uint32_t col = 0; col < colCount; ++col)
@@ -118,7 +118,7 @@ void Matrix::replaceCol(uint32_t colNumber, const vector<ZNumber> &newCol){
 	if(colNumber >= colCount)
 		throw logic_error("colNumber is greater than max col index");
 
-	if(rowCount != newCol.size())
+	if(matrix.empty() == false && rowCount != newCol.size())
 		throw logic_error("col size does not match");
 
 
@@ -130,17 +130,18 @@ void Matrix::insertRow(const vector<ZNumber> &newRow, uint32_t rowNumber){
 	uint32_t rowCount = getRowCount();
 	uint32_t colCount = getColumnCount();
 
-	if(colCount != newRow.size())
+	if(matrix.empty() == false && colCount != newRow.size())
 		throw logic_error("row size doesn't match");
 
 	if(rowNumber > rowCount)
 		throw logic_error("rowNumber is more than rowCount");
 
 
-	resize(rowCount + 1, colCount);
+	resize(rowCount + 1, newRow.size());
+	rowCount = getRowCount();
 	uint32_t lastRowIndex = rowCount - 1;
 
-	for(uint32_t row = lastRowIndex; row > rowNumber; --row)//сдвигаем все строки после rowNumber на 1 позицию вниз
+	for(uint32_t row = lastRowIndex; row > rowNumber + 1; --row)//сдвигаем все строки после rowNumber на 1 позицию вниз
 		replaceRow(row, getRow(row - 1));
 	replaceRow(rowNumber, newRow);
 }
@@ -149,30 +150,31 @@ void Matrix::insertCol(const vector<ZNumber> &newCol, uint32_t colNumber){
 	uint32_t rowCount = getRowCount();
 	uint32_t colCount = getColumnCount();
 
-	if(rowCount != newCol.size())
+	if(matrix.empty() == false && rowCount != newCol.size())
 		throw logic_error("col size doesn't match");
 
 	if(colNumber > colCount)
 		throw logic_error("colNumber is more than colCount");
 
-	resize(rowCount, colCount + 1);
+	resize(newCol.size(), colCount + 1);
+	colCount = getColumnCount();
 	uint32_t lastColIndex = colCount - 1;
 
-	for(uint32_t col = lastColIndex; col > colNumber; --col)//сдвигаем все строки после rowNumber на 1 позицию вниз
+	for(uint32_t col = lastColIndex; col > colNumber + 1; --col)//сдвигаем все строки после rowNumber на 1 позицию вниз
 		replaceRow(col, getCol(col - 1));
 	replaceRow(colNumber, newCol);
 }
 
-inline void Matrix::pushRowBack(const vector<ZNumber> &newRow){
-	insertRow(newRow, getRowCount() - 1);
+void Matrix::pushRowBack(const vector<ZNumber> &newRow){
+	insertRow(newRow, getRowCount());
 }
 
-inline void Matrix::pushColBack(const vector<ZNumber> &newCol){
-	insertCol(newCol, getColumnCount() - 1);
+void Matrix::pushColBack(const vector<ZNumber> &newCol){
+	insertCol(newCol, getColumnCount());
 }
 
 
-inline bool Matrix::isSquare() const{
+bool Matrix::isSquare() const{
 	return getRowCount() == getColumnCount();
 }
 

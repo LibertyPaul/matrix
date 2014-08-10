@@ -13,10 +13,13 @@ Buffer::Buffer(const Buffer &buffer): size(buffer.getSize()), buffer(new uint8_t
 
 Buffer::Buffer(Buffer &&buffer): size(buffer.getSize()), buffer(move(buffer.buffer)), readPos(buffer.readPos), writePos(buffer.writePos){}
 
-void Buffer::operator=(Buffer &&buffer){
+const Buffer &Buffer::operator=(Buffer &&buffer){
 	this->buffer = move(buffer.buffer);
+	this->size = buffer.size;
 	this->readPos = buffer.readPos;
 	this->writePos = buffer.writePos;
+
+	return *this;
 }
 
 bool Buffer::operator==(const Buffer &buffer) const{
@@ -29,6 +32,17 @@ bool Buffer::operator==(const Buffer &buffer) const{
 
 	return true;
 }
+
+void Buffer::fill(uint8_t value){
+	for(uint64_t pos = 0; pos < size; ++pos)
+		get(pos) = value;
+}
+
+void Buffer::fill(const function<uint8_t()> &getValue){
+	for(uint64_t pos = 0; pos < size; ++pos)
+		get(pos) = getValue();
+}
+
 
 void Buffer::append(const Buffer &buffer){
 	uint64_t sumSize = this->getSize() + buffer.getSize();//для безопасости надо бы поставить ограничение макс. размера в 2^63

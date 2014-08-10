@@ -6,7 +6,7 @@
 #include <ostream>
 
 class ZNumber{
-	static const uint32_t module = 4294967291;//should be prime < 2^32
+	static const uint32_t module = 4294967291;//should be prime which is: 2^31 < P < 2^32
 	uint32_t n;
 public:
 	ZNumber(int64_t n = 0);
@@ -25,9 +25,9 @@ public:
 	const ZNumber &operator%=(const ZNumber &zn);
 
 
-	const ZNumber &operator++();
+	ZNumber &operator++();
 	ZNumber operator++(int);
-	const ZNumber &operator--();
+	ZNumber &operator--();
 	ZNumber operator--(int);
 
 
@@ -69,7 +69,5 @@ vector<ZNumber> operator*(vector<ZNumber> v, const ZNumber &zn);
 vector<ZNumber> operator/(vector<ZNumber> v, const ZNumber &zn);
 ZNumber sum(const vector<ZNumber> &v);
 
-void GCD_ext(int64_t a, int64_t b, int64_t &d, int64_t &x, int64_t &y);
-
-
+inline int64_t GCD_ext(int64_t n, int64_t module);
 #endif // ZNUMBER_HPP_INCLUDED

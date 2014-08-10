@@ -28,10 +28,21 @@ public:
 	Buffer(const Buffer &buffer);
 	Buffer(Buffer &&buffer);
 
-	void operator=(Buffer &&buffer);
+	const Buffer &operator=(Buffer &&buffer);
 	bool operator==(const Buffer &buffer) const;
 
+	void fill(uint8_t value);
+	void fill(const function<uint8_t()> &getValue);
+
+
 	void append(const Buffer &buffer);
+
+	template<typename T>
+	void push_back(const T &t){
+		Buffer t_buf(sizeof(t));
+		t_buf.write<T>(t);
+		this->append(t_buf);
+	}
 
 	void write(const void *data, uint64_t length);
 	void write(istream &i, uint64_t length);

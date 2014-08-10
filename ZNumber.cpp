@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <thread>
 
 using namespace std;
 #include "ZNumber.hpp"
@@ -35,8 +36,9 @@ ZNumber ZNumber::operator*(const ZNumber &zn) const{
 ZNumber ZNumber::operator/(const ZNumber &zn) const{
 	if(zn == 0)
 		throw logic_error("Division by 0");
-	int64_t d, x, y;
-	GCD_ext(zn.n, module, d, x, y);//хз как, но оно работает
+	//int64_t x, y;
+	//GCD_ext(zn.n, module, x, y);//хз как, но оно работает
+	int64_t x = GCD_ext(zn.n, module);
 	return *this * x;
 }
 
@@ -76,20 +78,26 @@ const ZNumber &ZNumber::operator%=(const ZNumber &zn){
 }
 
 
-const ZNumber &ZNumber::operator++(){
-	return ZNumber(this->n++);
+ZNumber &ZNumber::operator++(){
+	*this += 1;
+	return *this;
 }
 
 ZNumber ZNumber::operator++(int){
-	return ZNumber(++this->n);
+	ZNumber copy(*this);
+	*this += 1;
+	return copy;
 }
 
-const ZNumber &ZNumber::operator--(){
-	return ZNumber(this->n--);
+ZNumber &ZNumber::operator--(){
+	*this -= 1;
+	return *this;
 }
 
 ZNumber ZNumber::operator--(int){
-	return ZNumber(--this->n);
+	ZNumber copy(*this);
+	*this -= 1;
+	return copy;
 }
 
 
@@ -232,18 +240,28 @@ ZNumber sum(const vector<ZNumber> &v){
 }
 
 
+inline int64_t GCD_ext(int64_t n, int64_t module){
+	int64_t t = 0, new_t = 1;
+	int64_t r = module, new_r = n;
 
-void GCD_ext(int64_t a, int64_t b, int64_t &d, int64_t &x, int64_t &y){
-	if(b == 0){
-		d = a;
-		x = 1;
-		y = 0;
-		return;
+	int64_t temp;
+	while(new_r != 0){
+		uint64_t quotient = r / new_r;
+
+		temp = t;
+		t = new_t;
+		new_t = temp - quotient * new_t;
+
+		temp = r;
+		r = new_r;
+		new_r = temp - quotient * new_r;
 	}
-	GCD_ext(b, a % b, d, x, y);
-	int64_t t = y;
-	y = x - (a / b) * y;
-	x = t;
+	if(r > 1)
+		throw logic_error("N is not invertible");
+	if(t < 0)
+		t = t + module;
+
+	return t;
 }
 
 
