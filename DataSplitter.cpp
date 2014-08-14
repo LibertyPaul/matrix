@@ -1,6 +1,5 @@
 #include <chrono>
 #include <stdexcept>
-#include <thread>
 
 
 #include "stuff.h"
@@ -15,11 +14,10 @@ DataSplitter::DataSplitter(uint32_t K, uint32_t N): K(K), N(N), randomGenerator(
 
 
 
-void DataSplitter::randomizeHigherBitsOfSecret(vector<ZNumber> &secret) const{
+inline void DataSplitter::randomizeHigherBitsOfSecret(vector<ZNumber> &secret) const{
 	for(auto &zn : secret){
-		uint32_t value = zn.getValue();
-		value ^= (randomGenerator() % 2) << bitCapacity;
-		zn = value;
+		uint32_t mask = randomGenerator() % 2 << bitCapacity;
+		zn ^= mask;
 	}
 }
 
@@ -37,24 +35,19 @@ Matrix DataSplitter::split(const vector<uint32_t> &data) const{
 
 
 	vector<Matrix> matrices(N);
-	vector<thread> threads;//потоков может быть слишком много. надо бы как нибудь ограничить их число 8 или 16
 	for(auto &matrix : matrices){
-		//threads.emplace_back([&](){
-			matrix.resize(K, K);
+		matrix.resize(K, K);
+		matrix.randomize();
+
+		size_t secretRowNumber = randomGenerator() % matrix.getRowCount();//выбираем случайную строку для вставки секрета
+		matrix.replaceRow(secretRowNumber, secret);
+
+		while(matrix.calcDeterminant() == 0){
 			matrix.randomize();
-
-			size_t secretRowNumber = randomGenerator() % matrix.getRowCount();//выбираем случайную строку для вставки секрета
+			randomizeHigherBitsOfSecret(secret);
 			matrix.replaceRow(secretRowNumber, secret);
-
-			while(matrix.calcDeterminant() == 0){
-				matrix.randomize();
-				randomizeHigherBitsOfSecret(secret);
-				matrix.replaceRow(secretRowNumber, secret);
-			}
-		//});
+		}
 	}
-//	for(auto &t : threads)
-	//	t.join();
 
 
 	Matrix linearEquasion;//если N > K, то уравнение избыточно.

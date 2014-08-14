@@ -17,7 +17,7 @@ public:
 	Matrix(Matrix &&matrix);
 	Matrix(uint32_t rowNumber, uint32_t colNumber);
 	Matrix(const vector<vector<ZNumber>> &matrix);
-	Matrix(const initializer_list<vector<ZNumber>> &initList);
+	//Matrix(const initializer_list<vector<ZNumber>> &initList);//TODO переделать через get(uint32_t row, uint32_t col)
 
 
 	uint32_t getRowCount() const;
@@ -30,11 +30,11 @@ public:
 	ZNumber &get(uint32_t row, uint32_t col);
 	const ZNumber &get(uint32_t row, uint32_t col) const;
 
-	vector<ZNumber> getCol(uint32_t colNumber) const;
 	vector<ZNumber> getRow(uint32_t rowNumber) const;
+	vector<ZNumber> getCol(uint32_t colNumber) const;
 
-	void replaceCol(uint32_t colNumber, const vector<ZNumber> &newCol);
 	void replaceRow(uint32_t rowNumber, const vector<ZNumber> &newRow);
+	void replaceCol(uint32_t colNumber, const vector<ZNumber> &newCol);
 
 	void insertRow(const vector<ZNumber> &newRow, uint32_t rowNumber);
 	void insertCol(const vector<ZNumber> &newCol, uint32_t colNumber);

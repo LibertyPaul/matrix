@@ -13,11 +13,15 @@ class Buffer{
 
 	uint64_t readPos, writePos;
 
+	uint8_t *getPtr();
+	const uint8_t *getPtr() const;
+
 	void lowLevelWrite(const void *data, uint64_t length, uint64_t from = 0);//lowLevel операции не затрагивают readPos и writePos
 	void lowLevelRead(void *dst, uint64_t length, uint64_t from = 0) const;
 public:
 	Buffer();
 	Buffer(uint64_t size);
+	Buffer(const string &src);
 
 	template<typename T>
 	Buffer(const vector<T> &src): size(src.size() * sizeof(T)), buffer(new uint8_t[size]), readPos(0), writePos(size){
@@ -97,15 +101,14 @@ public:
 	uint64_t getWriteSpace() const;
 	uint64_t getReadSpace() const;
 
-	void *get();
-	const void *get() const;
+
 
 	template<typename T = uint8_t>
 	T &get(uint64_t pos){
 		if(writePos - sizeof(T) < pos * sizeof(T))
 			throw runtime_error("Out of buffer");
 
-		T *ptr = reinterpret_cast<T *>(this->get() + pos * sizeof(T));
+		T *ptr = reinterpret_cast<T *>(getPtr() + pos * sizeof(T));
 		return *ptr;
 	}
 
@@ -114,14 +117,15 @@ public:
 		if(writePos - sizeof(T) < pos * sizeof(T))
 			throw runtime_error("Out of buffer");
 
-		const T *ptr = reinterpret_cast<const T *>(this->get() + pos * sizeof(T));
+		const T *ptr = reinterpret_cast<const T *>(getPtr() + pos * sizeof(T));
 		return *ptr;
 	}
 
 
 	uint64_t getSize() const;
 
-	string toString() const;
+	string toBitString() const;
+	string toCharString() const;
 };
 
 

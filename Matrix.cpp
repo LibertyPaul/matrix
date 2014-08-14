@@ -21,18 +21,32 @@ Matrix::Matrix(uint32_t rowNumber, uint32_t colNumber): matrix(){
 }
 
 Matrix::Matrix(const vector<vector<ZNumber>> &matrix): matrix(){
-	for(auto i = matrix.begin(); i != matrix.end() - 1; ++i)
-		if(i->size() != (i + 1)->size())
-			throw logic_error("Row size does not match");
-	this->matrix = matrix;
-}
+	uint32_t rowCount = matrix.size();
+	uint32_t colCount;
+	if(rowCount == 0)
+		colCount = 0;//0 строк -> 0 столбцов
+	else
+		colCount = matrix.front().size();
 
+
+	for(auto it = matrix.cbegin() + 1; it != matrix.cend(); ++it)//проверка на равенство длинн строк
+		if(it->size() != colCount)
+			throw logic_error("Row size differs");
+
+
+	resize(rowCount, colCount);
+
+	for(uint32_t row = 0; row < rowCount; ++row)
+		for(uint32_t col = 0; col < colCount; ++col)
+			get(row, col) = matrix.at(row).at(col);
+}
+/*
 Matrix::Matrix(const initializer_list<vector<ZNumber>> &initList): matrix(initList){
 	for(auto i = matrix.begin(); i != matrix.end() - 1; ++i)
 		if(i->size() != (i + 1)->size())
 			throw logic_error("Row size does not match");
 }
-
+*/
 
 
 void Matrix::resize(uint32_t rowNumber, uint32_t colNumber){

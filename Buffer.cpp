@@ -7,26 +7,58 @@ using namespace std;
 Buffer::Buffer(): size(0), buffer(nullptr), readPos(0), writePos(0){}
 Buffer::Buffer(uint64_t size): size(size), buffer(new uint8_t[size]), readPos(0), writePos(0){}
 
+Buffer::Buffer(const string &src): size(src.length()), buffer(new uint8_t[size]), readPos(0), writePos(0){
+	for(uint64_t i = 0; i < size; ++i)
+		write<char>(src.at(i));
+	dropPointers();
+}
+
 Buffer::Buffer(const Buffer &buffer): size(buffer.getSize()), buffer(new uint8_t[size]), readPos(buffer.readPos), writePos(buffer.writePos){
-	memcpy(this->get(), buffer.get(), size);
+	memcpy(getPtr(), buffer.getPtr(), getSize());
 }
 
 Buffer::Buffer(Buffer &&buffer): size(buffer.getSize()), buffer(move(buffer.buffer)), readPos(buffer.readPos), writePos(buffer.writePos){}
 
 const Buffer &Buffer::operator=(Buffer &&buffer){
 	this->buffer = move(buffer.buffer);
-	this->size = buffer.size;
+	this->size = buffer.getSize();
 	this->readPos = buffer.readPos;
 	this->writePos = buffer.writePos;
 
 	return *this;
 }
 
+
+uint8_t *Buffer::getPtr(){
+	return buffer.get();
+}
+
+const uint8_t *Buffer::getPtr() const{
+	return buffer.get();
+}
+
+
+void Buffer::lowLevelWrite(const void *data, uint64_t length, uint64_t from){
+	if(getSize() - from + 1 < length)
+		throw logic_error("Buffer out of range");
+
+	memcpy(getPtr() + from, data, length);
+}
+
+void Buffer::lowLevelRead(void *dst, uint64_t length, uint64_t from) const{
+	if(getSize() - from + 1 < length)
+		throw logic_error("Buffer out of range");
+
+	memcpy(dst, getPtr() + from, length);
+}
+
+
+
 bool Buffer::operator==(const Buffer &buffer) const{
-	if(this->size != buffer.size)
+	if(this->getSize() != buffer.getSize())
 		return false;
 
-	for(uint64_t i = 0; i < this->size; ++i)
+	for(uint64_t i = 0; i < this->getSize(); ++i)
 		if(this->get(i) != buffer.get(i))
 			return false;
 
@@ -63,21 +95,6 @@ void Buffer::append(const Buffer &buffer){
 
 
 
-void Buffer::lowLevelWrite(const void *data, uint64_t length, uint64_t from){
-	if(getSize() - from + 1 < length)
-		throw logic_error("Buffer out of range");
-
-	memcpy(buffer.get() + from, data, length);
-}
-
-void Buffer::lowLevelRead(void *dst, uint64_t length, uint64_t from) const{
-	if(getSize() - from + 1 < length)
-		throw logic_error("Buffer out of range");
-
-	memcpy(dst, buffer.get() + from, length);
-}
-
-
 
 void Buffer::dropPointers(){
 	readPos = 0;
@@ -94,7 +111,7 @@ void Buffer::write(istream &i, uint64_t length){
 	if(getWriteSpace() < length)
 		throw logic_error("Buffer overflow");
 
-	void *ptr = buffer.get() + writePos;
+	void *ptr = getPtr() + writePos;
 	i.read(reinterpret_cast<char *>(ptr), length);
 	writePos += length;
 }
@@ -118,19 +135,11 @@ void Buffer::read(ostream &o, uint64_t length){
 	if(getReadSpace() < length)
 		throw logic_error("Buffer reading overflow");
 
-	void *ptr = buffer.get() + readPos;
+	void *ptr = getPtr() + readPos;
 	o.write(reinterpret_cast<char *>(ptr), length);
 	readPos += length;
 }
 
-
-void *Buffer::get(){
-	return buffer.get();
-}
-
-const void *Buffer::get() const{
-	return buffer.get();
-}
 
 uint64_t Buffer::getSize() const{
 	return size;
@@ -141,13 +150,21 @@ uint64_t Buffer::getSize() const{
 
 
 
-string Buffer::toString() const{
+string Buffer::toBitString() const{
 	string res;
 	for(size_t i = 0; i < size; ++i){
+		uint8_t current = get<uint8_t>(i);
 		for(int bitRank = 7; bitRank >= 0; --bitRank)
-			res += get<uint8_t>(i) & 1 << bitRank ? "1" : "0";
+			res += current & 1 << bitRank ? "1" : "0";
 		res += " ";
 	}
+	return res;
+}
+
+string Buffer::toCharString() const{
+	string res;
+	for(uint64_t i = 0; i < size; ++i)
+		res += get<char>(i);
 	return res;
 }
 

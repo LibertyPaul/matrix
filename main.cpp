@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <chrono>
 #include <fstream>
+#include <random>
+#include <chrono>
 
 
 #include "stuff.h"
@@ -15,11 +16,21 @@ using namespace std;
 
 
 const uint16_t K = 10, N = 15;
-const uint64_t secretLength = 512;
+const uint64_t secretLength = 1024;
 
 string getFileName(uint32_t id){
 	return "parts/dataPart #" + to_string(id) + ".dat";
 }
+
+string generateSecret(size_t length){
+	mt19937 rd(chrono::system_clock::now().time_since_epoch().count());
+	string res;
+	res.resize(length);
+	for(size_t i = 0; i < length; ++i)
+		res.at(i) = 'A' + rd() % ('Z' - 'A' + 1);
+	return res;
+}
+
 
 void createKeys(const Buffer &secret){
 	DataSeparator dataSeparator(K, N);
@@ -53,7 +64,6 @@ void createKeys(const Buffer &secret){
 
 		currentRawInfo.dropPointers();
 		currentRawInfo.read(key_file, currentRawInfo.getSize());
-		key_file.close();
 	}
 }
 
@@ -70,31 +80,26 @@ Buffer restore(){
 
 		Buffer currentRawInfo(fSize);
 		currentRawInfo.write(key_file, fSize);
-		key_file.close();
 
 		clients.push_back(move(ClientDataPart(currentRawInfo)));
 	}
 
-	vector<Matrix> splittedSecret;
 	uint32_t partCount = clients.front().getLinearEquasions().getRowCount();
-	for(uint32_t part = 0; part < partCount; ++part){
-		Matrix currentLESystem;
+	vector<Matrix> splittedSecret(partCount);
+	for(uint32_t part = 0; part < partCount; ++part)
 		for(uint32_t client = 0; client < K; ++client)
-			currentLESystem.pushRowBack(clients.at(client).getLinearEquasions().getRow(part));
+			splittedSecret.at(part).pushRowBack(clients.at(client).getLinearEquasions().getRow(part));
 
-		splittedSecret.push_back(move(currentLESystem));
-	}
 
 	DataSplitter dataSplitter(K, N);
 
 	vector<vector<uint32_t>> restored;
 	for(const auto &matrix : splittedSecret){
-		vector<uint32_t> secretPart = dataSplitter.restore(matrix);
+		vector<uint32_t> secretPart = move(dataSplitter.restore(matrix));
 		restored.push_back(secretPart);
 	}
 
 	DataSeparator dataSeparator(K, N);
-
 	Buffer result = move(dataSeparator.restore(restored));
 	return result;
 }
@@ -103,15 +108,13 @@ Buffer restore(){
 
 
 int main(){
-	size_t seed = chrono::system_clock::now().time_since_epoch().count();
-	mt19937 randomGenerator(seed);
-
-	Buffer secret(secretLength);
-	secret.fill(randomGenerator);
+	string key = generateSecret(50);
+	cout << key << endl;
+	Buffer secret(key);
 
 	createKeys(secret);
 	Buffer restored = move(restore());
+	string res = restored.toCharString();
 
-	cout << (secret == restored ? "+" : "-") << endl;
-
+	cout << res << endl;
 }

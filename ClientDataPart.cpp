@@ -38,7 +38,7 @@ Buffer ClientDataPart::toBinaryContainer() const{
 	uint32_t colCount = linearEquasions.getColumnCount();
 
 	uint64_t bufferSize = additionalInfoSize + sizeof(uint32_t) * colCount * rowCount;
-	//структура контейнера: количество уравнений, размер уравнений, коэффициенты.
+	//структура контейнера: количество уравнений, размер уравнений, полиномы.
 	Buffer result(bufferSize);
 	result.write<uint32_t>(magic);
 	result.write<uint32_t>(rowCount);
