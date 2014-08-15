@@ -33,6 +33,9 @@ public:
 	Buffer(Buffer &&buffer);
 
 	const Buffer &operator=(Buffer &&buffer);
+	const Buffer &operator=(const Buffer &buffer);
+
+
 	bool operator==(const Buffer &buffer) const;
 
 	void fill(uint8_t value);
@@ -55,12 +58,12 @@ public:
 
 
 	template<typename T>
-	void write(const T &t){
+	inline void write(const T &t){
 		write(&t, sizeof(T));
 	}
 
 	template<typename T>
-	T read(){
+	inline T read(){
 		T t;
 		read(&t, sizeof(t));
 		return t;

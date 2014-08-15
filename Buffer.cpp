@@ -19,6 +19,7 @@ Buffer::Buffer(const Buffer &buffer): size(buffer.getSize()), buffer(new uint8_t
 
 Buffer::Buffer(Buffer &&buffer): size(buffer.getSize()), buffer(move(buffer.buffer)), readPos(buffer.readPos), writePos(buffer.writePos){}
 
+
 const Buffer &Buffer::operator=(Buffer &&buffer){
 	this->buffer = move(buffer.buffer);
 	this->size = buffer.getSize();
@@ -28,6 +29,10 @@ const Buffer &Buffer::operator=(Buffer &&buffer){
 	return *this;
 }
 
+const Buffer &Buffer::operator=(const Buffer &buffer){
+	Buffer b(buffer);
+	return *this = move(b);
+}
 
 uint8_t *Buffer::getPtr(){
 	return buffer.get();
