@@ -57,12 +57,12 @@ public:
 	void read(ostream &o, uint64_t length);
 
 
-	template<typename T>
+	template<typename T = uint8_t>
 	inline void write(const T &t){
 		write(&t, sizeof(T));
 	}
 
-	template<typename T>
+	template<typename T = uint8_t>
 	inline T read(){
 		T t;
 		read(&t, sizeof(t));
@@ -122,6 +122,14 @@ public:
 
 		const T *ptr = reinterpret_cast<const T *>(getPtr() + pos * sizeof(T));
 		return *ptr;
+	}
+
+	uint8_t &operator[](uint64_t pos){
+		return get(pos);
+	}
+
+	const uint8_t &operator[](uint64_t pos) const{
+		return get(pos);
 	}
 
 

@@ -4,17 +4,9 @@ using namespace std;
 #include "ZNumber.hpp"
 
 
-ZNumber::ZNumber(int64_t n){
-	if(n >= module)
-		 n %= module;
-	if(n < 0)
-		n = module - (-n % module);
-
-	this->n = n;
-}
 
 ZNumber ZNumber::operator+(const ZNumber &zn) const{
-	uint64_t res = static_cast<uint64_t>(this->n) + zn.n;
+	uint64_t res = static_cast<uint64_t>(this->getValue()) + zn.getValue();
 	if(res >= module)
 		res %= module;
 	return res;
@@ -25,23 +17,24 @@ ZNumber ZNumber::operator-(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator*(const ZNumber &zn) const{
-	uint64_t res = static_cast<uint64_t>(this->n) * zn.n;
+	uint64_t res = static_cast<uint64_t>(this->getValue()) * zn.getValue();
 	if(res >= module)
 		res %= module;
 
 	return res;
 }
 
-ZNumber ZNumber::getInverse() const{
+inline ZNumber ZNumber::getInverse() const{
 	if(this->n == 0)
 		throw logic_error("0 is not invertible");
 
 	int64_t t = 0, new_t = 1;
 	int64_t r = module, new_r = this->getValue();
 
-	int64_t temp;
+	register int64_t temp;
+	register int64_t quotient;
 	while(new_r != 0){
-		uint64_t quotient = r / new_r;
+		quotient = r / new_r;
 
 		temp = t;
 		t = new_t;
@@ -53,10 +46,8 @@ ZNumber ZNumber::getInverse() const{
 	}
 	if(r > 1)
 		throw logic_error("N is not invertible");
-	if(t < 0)
-		t = t + module;
 
-	return t;
+	return ZNumber(t);
 }
 
 
@@ -67,7 +58,7 @@ ZNumber ZNumber::operator/(const ZNumber &zn) const{
 }
 
 ZNumber ZNumber::operator%(const ZNumber &zn) const{
-	return this->n % zn.n;
+	return this->getValue() % zn.getValue();
 }
 
 ZNumber ZNumber::operator^(const ZNumber &zn) const{
@@ -75,7 +66,7 @@ ZNumber ZNumber::operator^(const ZNumber &zn) const{
 }
 
 const ZNumber &ZNumber::operator=(const ZNumber &zn){
-	this->n = zn.n;
+	this->n = zn.getValue();
 	return *this;
 }
 
@@ -136,7 +127,7 @@ ZNumber ZNumber::operator--(int){
 
 
 bool ZNumber::operator==(const ZNumber &zn) const{
-	return this->n == zn.n;
+	return this->getValue() == zn.getValue();
 }
 
 bool ZNumber::operator!=(const ZNumber &zn) const{
@@ -144,11 +135,11 @@ bool ZNumber::operator!=(const ZNumber &zn) const{
 }
 
 bool ZNumber::operator<(const ZNumber &zn) const{
-	return this->n < zn.n;
+	return this->getValue() < zn.getValue();
 }
 
 bool ZNumber::operator>(const ZNumber &zn) const{
-	return this->n > zn.n;
+	return this->getValue() > zn.getValue();
 }
 
 bool ZNumber::operator<=(const ZNumber &zn) const{
@@ -160,30 +151,27 @@ bool ZNumber::operator>=(const ZNumber &zn) const{
 }
 
 bool ZNumber::operator!() const{
-	return !this->n;
+	return !this->getValue();
 }
 
 bool ZNumber::operator&&(const ZNumber &zn) const{
-	return this->n && zn.n;
+	return this->getValue() && zn.getValue();
 }
 
 bool ZNumber::operator||(const ZNumber &zn) const{
-	return this->n || zn.n;
+	return this->getValue() || zn.getValue();
 }
 
 
 ZNumber ZNumber::operator-() const{
-	return ZNumber(module - (n % module));
+	int64_t n_ = this->getValue();
+	return ZNumber(-n_);
 }
 
-
-uint32_t ZNumber::getValue() const{
-	return n;
-}
 
 string ZNumber::toString() const{
 	string res;
-	res = to_string(n);
+	res = to_string(this->getValue());
 	return res;
 }
 

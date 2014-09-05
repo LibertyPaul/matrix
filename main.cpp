@@ -1,8 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <random>
-#include <chrono>
+#include <sstream>
 
 
 #include "stuff.h"
@@ -13,26 +12,11 @@ using namespace std;
 #include "Buffer.hpp"
 #include "DataSeparator.hpp"
 #include "ClientDataPart.hpp"
+#include "Base16.hpp"
 
 
-const uint16_t K = 10, N = 15;
-const uint64_t secretLength = 1024;
 
-string getFileName(uint32_t id){
-	return "parts/dataPart #" + to_string(id) + ".dat";
-}
-
-string generateSecret(size_t length){
-	mt19937 rd(chrono::system_clock::now().time_since_epoch().count());
-	string res;
-	res.resize(length);
-	for(size_t i = 0; i < length; ++i)
-		res.at(i) = 'A' + rd() % ('Z' - 'A' + 1);
-	return res;
-}
-
-
-void createKeys(const Buffer &secret){
+vector<ClientDataPart> separate(const Buffer &secret, const uint16_t K, const uint16_t N){
 	DataSeparator dataSeparator(K, N);
 	vector<vector<uint32_t>> separatedSecret = dataSeparator.separate(secret);
 
@@ -55,34 +39,14 @@ void createKeys(const Buffer &secret){
 		clients.push_back(move(currentCDP));
 	}
 
-	for(uint32_t client = 0; client < N; ++client){
-		Buffer currentRawInfo = move(clients.at(client).toBinaryContainer());
-
-		ofstream key_file(getFileName(client), ios_base::trunc);
-		if(!key_file)
-			throw runtime_error("Can't access file");
-
-		currentRawInfo.dropPointers();
-		currentRawInfo.read(key_file, currentRawInfo.getSize());
-	}
+	return clients;
 }
 
-Buffer restore(){
-	vector<ClientDataPart> clients;
-	for(uint32_t client = 0; client < K; ++client){
-		ifstream key_file(getFileName(client));
-		if(!key_file)
-			throw runtime_error("Can't access file");
+Buffer restore(const vector<ClientDataPart> &clients, const uint16_t N){
+	if(clients.size() == 0)
+		throw runtime_error("empty input");
 
-		key_file.seekg(0, key_file.end);
-		size_t fSize = key_file.tellg();
-		key_file.seekg(0, key_file.beg);
-
-		Buffer currentRawInfo(fSize);
-		currentRawInfo.write(key_file, fSize);
-
-		clients.push_back(move(ClientDataPart(currentRawInfo)));
-	}
+	uint16_t K = clients.size();
 
 	uint32_t partCount = clients.front().getLinearEquasions().getRowCount();
 	vector<Matrix> splittedSecret(partCount);
@@ -104,17 +68,90 @@ Buffer restore(){
 	return result;
 }
 
-
-
-
-int main(){
-	string key = generateSecret(50);
-	cout << key << endl;
-	Buffer secret(key);
-
-	createKeys(secret);
-	Buffer restored = move(restore());
-	string res = restored.toCharString();
-
-	cout << res << endl;
+void man(const string &progName){
+	cout << "Usage: " << endl;
+	cout << progName << " <-separate N K secret>|<-restore N part1 part2 ... partK>" << endl;
 }
+
+int main(int argc, char **argv){//./progName <-separate N K key>|<-restore part1 part2 ...>
+	const string progName(argv[0]);
+	Base16 base16;
+
+	if(argc < 2){
+		man(progName);
+		return -1;
+	}
+
+	const string action(argv[1]);
+	if(action == "-separate"){
+		if(argc < 5){
+			man(progName);
+			return -1;
+		}
+		const string Nstr(argv[2]);
+		const string Kstr(argv[3]);
+
+
+		uint16_t N = stoi(Nstr);
+		uint16_t K = stoi(Kstr);
+
+		const string key(argv[4]);
+
+		vector<ClientDataPart> parts;
+
+		try{
+			parts = move(separate(key, K, N));
+		}catch(runtime_error &re){
+			cout << "Ошибка: " << re.what() << endl;
+		}catch(logic_error &le){
+			cout << "Ошибка: " << le.what() << endl;
+		}
+
+		size_t i = 0;
+		for(const auto &part : parts){
+			Buffer bc = move(part.toBinaryContainer());
+			string bc16 = base16.encode(bc);
+			cout << ++i << " : " << bc16 << endl << endl;
+		}
+	}
+	else if(action == "-restore"){
+		if(argc < 4){
+			man(progName);
+			return -1;
+		}
+
+		const string Nstr(argv[2]);
+		uint16_t N = stoi(Nstr);
+
+		vector<ClientDataPart> parts;
+		for(uint16_t i = 3; i < argc; ++i){
+			string bc16(argv[i]);
+			Buffer bc = base16.decode(bc16);
+			ClientDataPart cdp(bc);
+			parts.push_back(move(cdp));
+		}
+
+		Buffer result;
+		try{
+			result = move(restore(parts, N));
+		}catch(runtime_error &re){
+			cout << "Ошибка: " << re.what() << endl;
+		}catch(logic_error &le){
+			cout << "Ошибка: " << le.what() << endl;
+		}
+
+		cout << result.toCharString() << endl;
+
+
+	}
+
+}
+
+
+
+
+
+
+
+
+

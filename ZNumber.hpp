@@ -7,14 +7,25 @@
 class ZNumber{
 	static const uint32_t module = 4294967291;//should be prime between 2^31 and 2^32
 	uint32_t n;
+
+
+
+	inline ZNumber getInverse() const;//вычисляет 1 / n (mod module). Расширенный алгоритм Эвклида.
+
 public:
-	ZNumber(int64_t n = 0);
+	inline ZNumber(int64_t n = 0){
+		if(n >= module)
+			n %= module;
+		if(n < 0)
+			n = module - (-n % module);
+
+		this->n = n;
+	}
 
 	ZNumber operator+(const ZNumber &zn) const;
 	ZNumber operator-() const;
 	ZNumber operator-(const ZNumber &zn) const;
 	ZNumber operator*(const ZNumber &zn) const;
-	ZNumber getInverse() const;//вычисляет 1 / n (mod module). Расширенный алгоритм Эвклида.
 	ZNumber operator/(const ZNumber &zn) const;
 	ZNumber operator%(const ZNumber &zn) const;
 	ZNumber operator^(const ZNumber &zn) const;
@@ -48,8 +59,10 @@ public:
 
 
 
+	inline uint32_t getValue() const{
+		return this->n;
+	}
 
-	uint32_t getValue() const;
 	string toString() const;
 };
 
