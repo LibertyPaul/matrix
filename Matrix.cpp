@@ -292,9 +292,9 @@ vector<ZNumber> Matrix::solveLinearEquasionSystem() const{
 	uint32_t K = this->getRowCount();
 
 	if(this->getColumnCount() > K + 1)
-		throw logic_error("Equasion system is redundant: \n" + this->toString());
-	if(this->getColumnCount() < K + 1)
 		throw logic_error("Equasion system is insufficient: \n" + this->toString());
+	if(this->getColumnCount() < K + 1)
+		throw logic_error("Equasion system is redundant: \n" + this->toString());
 
 
 

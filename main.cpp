@@ -42,7 +42,7 @@ vector<ClientDataPart> separate(const Buffer &secret, const uint16_t K, const ui
 	return clients;
 }
 
-Buffer restore(const vector<ClientDataPart> &clients, const uint16_t N){
+Buffer restore(const vector<ClientDataPart> &clients){
 	if(clients.size() == 0)
 		throw runtime_error("empty input");
 
@@ -54,7 +54,7 @@ Buffer restore(const vector<ClientDataPart> &clients, const uint16_t N){
 		for(uint32_t client = 0; client < K; ++client)
 			splittedSecret.at(part).pushRowBack(clients.at(client).getLinearEquasions().getRow(part));
 
-
+	uint16_t N = 42;//N ни на что не влияет при восстановлении. надо бы подпраить классы чтоб не требовали ее когда не нужно
 	DataSplitter dataSplitter(K, N);
 
 	vector<vector<uint32_t>> restored;
@@ -70,7 +70,7 @@ Buffer restore(const vector<ClientDataPart> &clients, const uint16_t N){
 
 void man(const string &progName){
 	cout << "Usage: " << endl;
-	cout << progName << " <-separate N K secret>|<-restore N part1 part2 ... partK>" << endl;
+	cout << progName << " <-separate N K secret>|<-restore part1 part2 ... partK>" << endl;
 }
 
 int main(int argc, char **argv){//./progName <-separate N K key>|<-restore part1 part2 ...>
@@ -115,16 +115,14 @@ int main(int argc, char **argv){//./progName <-separate N K key>|<-restore part1
 		}
 	}
 	else if(action == "-restore"){
-		if(argc < 4){
+		if(argc < 3){
 			man(progName);
 			return -1;
 		}
 
-		const string Nstr(argv[2]);
-		uint16_t N = stoi(Nstr);
 
 		vector<ClientDataPart> parts;
-		for(uint16_t i = 3; i < argc; ++i){
+		for(uint16_t i = 2; i < argc; ++i){
 			string bc16(argv[i]);
 			Buffer bc = base16.decode(bc16);
 			ClientDataPart cdp(bc);
@@ -133,7 +131,7 @@ int main(int argc, char **argv){//./progName <-separate N K key>|<-restore part1
 
 		Buffer result;
 		try{
-			result = move(restore(parts, N));
+			result = move(restore(parts));
 		}catch(runtime_error &re){
 			cout << "Ошибка: " << re.what() << endl;
 		}catch(logic_error &le){
