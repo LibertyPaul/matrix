@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 
-#include "stuff.h"
+#include "stuff.hpp"
 using namespace std;
 #include "ZNumber.hpp"
 #include "DataSplitter.hpp"

@@ -13,13 +13,13 @@ class ZNumber{
 	inline ZNumber getInverse() const;//вычисляет 1 / n (mod module). Расширенный алгоритм Эвклида.
 
 public:
-	inline ZNumber(int64_t n = 0){
+	inline ZNumber(const int64_t n = 0){
 		if(n >= module)
-			n %= module;
-		if(n < 0)
-			n = module - (-n % module);
-
-		this->n = n;
+			this->n = n % module;
+		else if(n < 0)
+			this->n = module - (-n % module);
+		else
+			this->n = n;
 	}
 
 	ZNumber operator+(const ZNumber &zn) const;

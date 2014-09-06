@@ -1,8 +1,6 @@
 #ifndef DATASEPARATOR_HPP_INCLUDED
 #define DATASEPARATOR_HPP_INCLUDED
 
-
-
 #include <random>
 #include <vector>
 #include "Buffer.hpp"
