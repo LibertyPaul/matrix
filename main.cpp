@@ -15,15 +15,15 @@ using namespace std;
 
 
 vector<ClientDataPart> separate(const Buffer &secret, const uint16_t K, const uint16_t N){
-	DataSeparator dataSeparator(K, N);
+	DataSeparator dataSeparator(K);
 	vector<vector<uint32_t>> separatedSecret = dataSeparator.separate(secret);
 
-	DataSplitter dataSplitter(K, N);
+	DataSplitter dataSplitter;
 
 
 	vector<Matrix> splittedSecret;
 	for(const auto &secretPart : separatedSecret){
-		Matrix equasions = dataSplitter.split(secretPart);
+		Matrix equasions = dataSplitter.split(secretPart, K, N);
 		splittedSecret.push_back(move(equasions));
 	}
 
@@ -52,16 +52,15 @@ Buffer restore(const vector<ClientDataPart> &clients){
 		for(uint32_t client = 0; client < K; ++client)
 			splittedSecret.at(part).pushRowBack(clients.at(client).getLinearEquasions().getRow(part));
 
-	uint16_t N = 42;//N ни на что не влияет при восстановлении. надо бы подпраить классы чтоб не требовали ее когда не нужно
-	DataSplitter dataSplitter(K, N);
+	DataSplitter dataSplitter;
 
 	vector<vector<uint32_t>> restored;
 	for(const auto &matrix : splittedSecret){
-		vector<uint32_t> secretPart = move(dataSplitter.restore(matrix));
+		vector<uint32_t> secretPart = move(dataSplitter.restore(matrix, K));
 		restored.push_back(secretPart);
 	}
 
-	DataSeparator dataSeparator(K, N);
+	DataSeparator dataSeparator(K);
 	Buffer result = move(dataSeparator.restore(restored));
 	return result;
 }

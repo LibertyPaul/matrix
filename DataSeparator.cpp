@@ -7,14 +7,11 @@ using namespace std;
 #include "DataSeparator.hpp"
 
 
-DataSeparator::DataSeparator(uint32_t K, uint32_t N):
+DataSeparator::DataSeparator(const uint32_t K):
 	K(K),
-	N(N),
 	randomGenerator(chrono::system_clock::now().time_since_epoch().count()),
 	effectiveSingleStorageSize((K * bitCapacity - serviceInformation_bits) / 8){
 
-	if(N < K)
-		throw logic_error("N must be larger or equal to K");
 
 	if(K * bitCapacity < sizeof(DataContainer))
 		throw logic_error("K is so small, that even container info can't be emplaced in container");

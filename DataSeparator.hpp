@@ -14,10 +14,6 @@ struct DataContainer{
 
 class DataSeparator{
 	uint32_t K;
-	uint32_t N;
-
-
-
 	mutable mt19937 randomGenerator;
 
 	const size_t serviceInformation = sizeof(DataContainer);
@@ -31,7 +27,7 @@ class DataSeparator{
 	vector<uint32_t> raw2container(const Buffer &src, size_t length) const;//src - буффер с полезной инфой
 	Buffer container2raw(const vector<uint32_t> &src) const;
 public:
-	DataSeparator(uint32_t K, uint32_t N);
+	DataSeparator(const uint32_t K);
 
 	vector<vector<uint32_t>> separate(const Buffer &data) const;
 	Buffer restore(const vector<vector<uint32_t>> &parts) const;

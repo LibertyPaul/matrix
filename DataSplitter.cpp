@@ -7,9 +7,8 @@ using namespace std;
 #include "ZNumber.hpp"
 #include "DataSplitter.hpp"
 
-DataSplitter::DataSplitter(uint32_t K, uint32_t N): K(K), N(N), randomGenerator(chrono::system_clock::now().time_since_epoch().count()){
-	if(N < K)
-		throw logic_error("N must be larger or equal to K");
+DataSplitter::DataSplitter():
+	randomGenerator(chrono::system_clock::now().time_since_epoch().count()){
 }
 
 
@@ -22,7 +21,10 @@ inline void DataSplitter::randomizeHigherBitsOfSecret(vector<ZNumber> &secret) c
 }
 
 
-Matrix DataSplitter::split(const vector<uint32_t> &data) const{
+Matrix DataSplitter::split(const vector<uint32_t> &data, const uint32_t K, const uint32_t N) const{
+	if(K > N)
+		throw logic_error("N must be >= K");
+
 	if(data.size() != K)
 		throw runtime_error("secret size must be == K");
 
@@ -58,7 +60,7 @@ Matrix DataSplitter::split(const vector<uint32_t> &data) const{
 }
 
 
-vector<uint32_t> DataSplitter::restore(const Matrix &linearEquasion) const{
+vector<uint32_t> DataSplitter::restore(const Matrix &linearEquasion, const uint32_t K) const{
 	vector<ZNumber> coords = linearEquasion.solveLinearEquasionSystem();
 	if(coords.size() != K)
 		throw runtime_error("secret size != K");
